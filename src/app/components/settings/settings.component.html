@@ -1,0 +1,81 @@
+<div class="container py-4 settings-page">
+  <h2 class="mb-4">Settings</h2>
+
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='account'" (click)="switchTab('account')">Account</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='appearance'" (click)="switchTab('appearance')">Appearance</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='notifications'" (click)="switchTab('notifications')">Notifications</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab==='privacy'" (click)="switchTab('privacy')">Privacy</button></li>
+  </ul>
+
+  <div class="card" *ngIf="activeTab==='account'">
+    <div class="card-body">
+      <h5 class="card-title">Account</h5>
+      <p class="text-muted">Manage your account details.</p>
+      <button class="btn btn-primary" (click)="goToProfile()"><i class="fas fa-user me-2"></i>Open Profile</button>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="activeTab==='appearance'">
+    <div class="card-body">
+      <h5 class="card-title">Appearance</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Theme</label>
+          <select class="form-select" [(ngModel)]="settings.theme" name="theme" (change)="applyTheme(settings.theme)">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Density</label>
+          <select class="form-select" [(ngModel)]="settings.density" name="density" (change)="applyDensity(settings.density)">
+            <option value="comfortable">Comfortable</option>
+            <option value="compact">Compact</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="activeTab==='notifications'">
+    <div class="card-body">
+      <h5 class="card-title">Notifications</h5>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="emailNoti" [(ngModel)]="settings.notifications.email" name="emailNoti">
+        <label class="form-check-label" for="emailNoti">Email notifications</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="smsNoti" [(ngModel)]="settings.notifications.sms" name="smsNoti">
+        <label class="form-check-label" for="smsNoti">SMS notifications</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="marketingNoti" [(ngModel)]="settings.notifications.marketing" name="marketingNoti">
+        <label class="form-check-label" for="marketingNoti">Marketing emails</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="activeTab==='privacy'">
+    <div class="card-body">
+      <h5 class="card-title">Privacy</h5>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="rememberMe" [(ngModel)]="settings.privacy.rememberMe" name="rememberMe">
+        <label class="form-check-label" for="rememberMe">Remember me on this device</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="analytics" [(ngModel)]="settings.privacy.analytics" name="analytics">
+        <label class="form-check-label" for="analytics">Share anonymous usage analytics</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 mt-3">
+    <button class="btn btn-success" (click)="save()" [disabled]="saving">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      Save Settings
+    </button>
+    <span *ngIf="savedAt" class="text-muted small">Saved {{ savedAt | date:'shortTime' }}</span>
+  </div>
+</div>

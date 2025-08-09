@@ -1,0 +1,10 @@
+<button 
+  type="button" 
+  [class]="getButtonClass()"
+  (click)="toggleFavorite($event)"
+  [disabled]="isLoading"
+  [title]="getButtonText()"
+>
+  <i [class]="getIconClass()"></i>
+  <span *ngIf="showText" class="favorite-text">{{ getButtonText() }}</span>
+</button> 

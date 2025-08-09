@@ -1,0 +1,350 @@
+<div class="car-search-container">
+  <div class="container py-4">
+    <!-- Search Header -->
+    <div class="search-header text-center mb-5 fade-in">
+      <h1 class="display-5 fw-bold text-white mb-3">Discover Your Perfect Ride</h1>
+      <p class="lead text-white-50">Explore WheelDeal's curated collection of premium vehicles</p>
+    </div>
+
+    <!-- Advanced Search Component -->
+    <app-advanced-search
+      (searchResults)="onAdvancedSearch($event)"
+    ></app-advanced-search>
+
+    <!-- Basic Search Filters (Legacy) -->
+    <div class="search-filters card mb-4 slide-up">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>
+            Quick Search
+          </h5>
+          <small class="text-muted">Use advanced search above for more options</small>
+        </div>
+        
+        <form [formGroup]="searchForm" (ngSubmit)="searchCars()">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-car me-2"></i>Brand
+              </label>
+              <select class="form-select" formControlName="brand">
+                <option value="">All Brands</option>
+                <option *ngFor="let brand of carBrands" [value]="brand">{{ brand }}</option>
+              </select>
+            </div>
+            
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-cogs me-2"></i>Type
+              </label>
+              <select class="form-select" formControlName="type">
+                <option value="">All Types</option>
+                <option *ngFor="let type of carTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+            
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-map-marker-alt me-2"></i>City
+              </label>
+              <select class="form-select" formControlName="city">
+                <option value="">All Cities</option>
+                <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+              </select>
+            </div>
+            
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-dollar-sign me-2"></i>Max Price
+              </label>
+              <select class="form-select" formControlName="maxPrice">
+                <option value="">Any Price</option>
+                <option value="50">Under $50</option>
+                <option value="100">Under $100</option>
+                <option value="200">Under $200</option>
+                <option value="500">Under $500</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-12 text-center">
+              <button type="submit" class="btn btn-primary btn-lg me-3" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!isLoading" class="fas fa-search me-2"></i>
+                {{ isLoading ? 'Searching...' : 'Quick Search' }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-lg" (click)="clearFilters()">
+                <i class="fas fa-times me-2"></i>Clear Filters
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-white mb-0">
+          <i class="fas fa-car me-2"></i>
+          Premium Vehicles 
+          <span class="badge bg-primary ms-2">{{ cars.length }}</span>
+        </h3>
+        <div class="view-toggle">
+          <div class="btn-group" role="group">
+            <button 
+              type="button" 
+              class="btn btn-outline-light"
+              [class.active]="viewMode === 'grid'"
+              (click)="setViewMode('grid')"
+            >
+              <i class="fas fa-th"></i>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-outline-light"
+              [class.active]="viewMode === 'list'"
+              (click)="setViewMode('list')"
+            >
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner"></div>
+        <p class="text-white mt-3">Loading cars...</p>
+      </div>
+
+      <!-- No Results -->
+      <div *ngIf="!isLoading && cars.length === 0" class="no-results text-center py-5">
+        <div class="no-results-icon mb-3">
+          <i class="fas fa-car-crash fa-4x text-white-50"></i>
+        </div>
+        <h4 class="text-white">No cars found</h4>
+        <p class="text-white-50">Try adjusting your search filters</p>
+      </div>
+
+      <!-- Grid View -->
+      <div *ngIf="!isLoading && cars.length > 0 && viewMode === 'grid'" class="row g-4">
+        <div 
+          *ngFor="let car of cars; let i = index" 
+          class="col-lg-4 col-md-6"
+          [style.animation-delay]="(i * 0.1) + 's'"
+        >
+          <div class="car-card card h-100 bounce-in">
+            <div class="car-image">
+              <img [src]="getCarImage(car)" [alt]="car.brand + ' ' + car.model" class="card-img-top">
+              <div class="car-badge">
+                <span class="badge bg-success" *ngIf="car.availability">Available</span>
+                <span class="badge bg-danger" *ngIf="!car.availability">Unavailable</span>
+              </div>
+              <div class="favorite-overlay">
+                <app-favorite-button 
+                  [carId]="car.id" 
+                  size="sm"
+                ></app-favorite-button>
+              </div>
+            </div>
+            
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title fw-bold">
+                <a [routerLink]="['/cars', car.id]" class="text-decoration-none text-dark">
+                  {{ car.brand }} {{ car.model }}
+                </a>
+              </h5>
+              <p class="card-text text-muted mb-2">
+                <i class="fas fa-calendar me-2"></i>{{ car.year }} • 
+                <i class="fas fa-car me-2"></i>{{ car.type }}
+              </p>
+              <p class="card-text text-muted mb-3">
+                <i class="fas fa-map-marker-alt me-2"></i>{{ car.branchName }}, {{ car.branchCity }}
+              </p>
+              
+              <!-- Rating Display -->
+              <div class="rating-section mb-3" *ngIf="car.averageRating">
+                <app-star-rating
+                  [rating]="car.averageRating"
+                  [readonly]="true"
+                  size="sm"
+                  [showValue]="true"
+                  [showCount]="true"
+                  [ratingCount]="car.ratingCount || 0"
+                ></app-star-rating>
+              </div>
+              
+              <div class="mt-auto">
+                <div class="price-section mb-3">
+                  <span class="price-amount">${{ car.price }}</span>
+                  <span class="price-period">/day</span>
+                </div>
+                
+                <button 
+                  class="btn btn-primary w-100" 
+                  [disabled]="!car.availability"
+                  (click)="bookCar(car)"
+                >
+                  <i class="fas fa-calendar-plus me-2"></i>
+                  {{ car.availability ? 'Book Now' : 'Unavailable' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- List View -->
+      <div *ngIf="!isLoading && cars.length > 0 && viewMode === 'list'" class="list-view">
+        <div 
+          *ngFor="let car of cars; let i = index" 
+          class="car-list-item card mb-3 slide-up"
+          [style.animation-delay]="(i * 0.05) + 's'"
+        >
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-2">
+                <img [src]="getCarImage(car)" [alt]="car.brand + ' ' + car.model" class="car-list-image">
+              </div>
+              <div class="col-md-6">
+                <h5 class="fw-bold mb-1">
+                  <a [routerLink]="['/cars', car.id]" class="text-decoration-none text-dark">
+                    {{ car.brand }} {{ car.model }}
+                  </a>
+                </h5>
+                <p class="text-muted mb-1">
+                  <i class="fas fa-calendar me-2"></i>{{ car.year }} • 
+                  <i class="fas fa-car me-2"></i>{{ car.type }}
+                </p>
+                <p class="text-muted mb-0">
+                  <i class="fas fa-map-marker-alt me-2"></i>{{ car.branchName }}, {{ car.branchCity }}
+                </p>
+                
+                <!-- Rating Display for List View -->
+                <div class="rating-section mt-2" *ngIf="car.averageRating">
+                  <app-star-rating
+                    [rating]="car.averageRating"
+                    [readonly]="true"
+                    size="sm"
+                    [showValue]="true"
+                    [showCount]="true"
+                    [ratingCount]="car.ratingCount || 0"
+                  ></app-star-rating>
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <div class="price-section">
+                  <span class="price-amount">${{ car.price }}</span>
+                  <span class="price-period">/day</span>
+                </div>
+              </div>
+              <div class="col-md-2 text-end">
+                <div class="d-flex flex-column align-items-end gap-2">
+                  <app-favorite-button 
+                    [carId]="car.id" 
+                    size="sm"
+                  ></app-favorite-button>
+                  
+                  <span class="badge bg-success" *ngIf="car.availability">Available</span>
+                  <span class="badge bg-danger" *ngIf="!car.availability">Unavailable</span>
+                  
+                  <button 
+                    class="btn btn-primary" 
+                    [disabled]="!car.availability"
+                    (click)="bookCar(car)"
+                  >
+                    <i class="fas fa-calendar-plus me-2"></i>Book
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1" *ngIf="selectedCar">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-calendar-plus me-2"></i>
+          Book {{ selectedCar.brand }} {{ selectedCar.model }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Start Date</label>
+              <input type="date" class="form-control" formControlName="startDate" [min]="minDate">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">End Date</label>
+              <input type="date" class="form-control" formControlName="endDate" [min]="minDate">
+            </div>
+          </div>
+          
+          <!-- Availability Status -->
+          <div class="availability-status mb-3" *ngIf="availabilityStatus">
+            <div class="alert" [ngClass]="{
+              'alert-success': availabilityStatus === 'available',
+              'alert-danger': availabilityStatus === 'unavailable',
+              'alert-info': availabilityStatus === 'checking'
+            }">
+              <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" *ngIf="availabilityStatus === 'checking'"></div>
+                <i class="fas me-2" [ngClass]="{
+                  'fa-check-circle': availabilityStatus === 'available',
+                  'fa-times-circle': availabilityStatus === 'unavailable',
+                  'fa-clock': availabilityStatus === 'checking'
+                }"></i>
+                <span *ngIf="availabilityStatus === 'available'">✓ Available for selected dates</span>
+                <span *ngIf="availabilityStatus === 'unavailable'">✗ Not available for selected dates</span>
+                <span *ngIf="availabilityStatus === 'checking'">Checking availability...</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="booking-summary p-3 bg-light rounded">
+            <h6 class="fw-bold mb-2">Booking Summary</h6>
+            <div class="d-flex justify-content-between">
+              <span>Daily Rate:</span>
+              <span>${{ selectedCar.price }}</span>
+            </div>
+            <div class="d-flex justify-content-between" *ngIf="bookingDays > 0">
+              <span>Duration:</span>
+              <span>{{ bookingDays }} day(s)</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold">
+              <span>Total:</span>
+              <span>${{ totalPrice }}</span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          [disabled]="bookingForm.invalid || isBooking || availabilityStatus === 'unavailable'"
+          (click)="submitBooking()"
+        >
+          <span *ngIf="isBooking" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!isBooking" class="fas fa-check me-2"></i>
+          {{ isBooking ? 'Booking...' : 'Confirm Booking' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

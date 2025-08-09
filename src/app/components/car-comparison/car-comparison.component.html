@@ -1,0 +1,148 @@
+<div class="car-comparison-container">
+  <div class="comparison-header">
+    <h2><i class="fas fa-balance-scale me-2"></i>Car Comparison Tool</h2>
+    <p class="text-muted">Select 2-5 cars to compare their specifications, features, and pricing</p>
+  </div>
+
+  <!-- Car Selection Section -->
+  <div class="car-selection-section">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-car me-2"></i>Select Cars to Compare</h5>
+        <div class="selection-info">
+          <span class="badge bg-primary">{{ selectedCarIds.length }}/{{ maxCars }} selected</span>
+          <span *ngIf="selectedCarIds.length < minCars" class="text-warning">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            Select at least {{ minCars }} cars to compare
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="car-grid">
+          <div *ngFor="let car of availableCars" 
+               class="car-card" 
+               [class.selected]="isCarSelected(car.id)"
+               [class.disabled]="!isCarSelected(car.id) && !canAddMoreCars()"
+               (click)="toggleCarSelection(car.id)">
+                         <div class="car-image">
+               <img [src]="getCarImage(car)" 
+                    [alt]="car.brand + ' ' + car.model">
+              <div class="selection-overlay">
+                <i *ngIf="isCarSelected(car.id)" class="fas fa-check-circle"></i>
+                <i *ngIf="!isCarSelected(car.id) && !canAddMoreCars()" class="fas fa-times-circle"></i>
+              </div>
+            </div>
+            <div class="car-info">
+              <h6>{{ car.brand }} {{ car.model }}</h6>
+              <p class="text-muted">{{ car.year }} • {{ car.type }}</p>
+              <p class="price">${{ car.price }}/day</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="selection-actions">
+          <button class="btn btn-primary" 
+                  [disabled]="!canCompare()"
+                  (click)="compareCars()">
+            <i class="fas fa-balance-scale me-2"></i>
+            Compare Cars
+          </button>
+          <button class="btn btn-outline-secondary" 
+                  (click)="clearSelection()">
+            <i class="fas fa-times me-2"></i>
+            Clear Selection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Comparing cars...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Comparison Results -->
+  <div *ngIf="comparisonResult && !isLoading" class="comparison-results">
+    <!-- Comparison Type Selector -->
+    <div class="comparison-type-selector">
+      <div class="btn-group" role="group">
+        <button class="btn btn-outline-primary" 
+                [class.active]="comparisonType === 'all'"
+                (click)="comparisonType = 'all'; compareCars()">
+          All
+        </button>
+        <button class="btn btn-outline-primary" 
+                [class.active]="comparisonType === 'specifications'"
+                (click)="comparisonType = 'specifications'; compareCars()">
+          Specifications
+        </button>
+        <button class="btn btn-outline-primary" 
+                [class.active]="comparisonType === 'features'"
+                (click)="comparisonType = 'features'; compareCars()">
+          Features
+        </button>
+        <button class="btn btn-outline-primary" 
+                [class.active]="comparisonType === 'pricing'"
+                (click)="comparisonType = 'pricing'; compareCars()">
+          Pricing
+        </button>
+        <button class="btn btn-outline-primary" 
+                [class.active]="comparisonType === 'rental'"
+                (click)="comparisonType = 'rental'; compareCars()">
+          Rental
+        </button>
+      </div>
+    </div>
+
+    <!-- Car Headers -->
+    <div class="comparison-table">
+      <div class="comparison-header-row">
+        <div class="attribute-column">
+          <h6>Attributes</h6>
+        </div>
+        <div *ngFor="let car of comparisonResult.cars" class="car-column">
+          <div class="car-header">
+            <img [src]="getCarImage(car)" 
+                 [alt]="car.brand + ' ' + car.model"
+                 class="car-thumbnail">
+            <h6>{{ car.brand }} {{ car.model }}</h6>
+            <p class="text-muted">{{ car.year }} • {{ car.type }}</p>
+            <p class="price">${{ car.price }}/day</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Data -->
+      <div *ngIf="getComparisonSection()" class="comparison-data">
+        <div *ngFor="let category of getComparisonSection() | keyvalue" class="comparison-category">
+          <div class="category-header">
+            <h6>{{ category.key }}</h6>
+          </div>
+          
+          <div *ngFor="let attribute of category.value" class="comparison-row">
+            <div class="attribute-label">
+              {{ attribute.attributeLabel }}
+            </div>
+            <div *ngFor="let value of attribute.value; let i = index" 
+                 class="attribute-value"
+                 [ngClass]="getHighlightClass(attribute)">
+              {{ formatValue(value, attribute.attributeType, attribute.unit) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

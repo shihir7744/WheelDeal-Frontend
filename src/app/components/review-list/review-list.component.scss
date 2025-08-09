@@ -1,0 +1,226 @@
+.review-list {
+  .reviews-header {
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    
+    h6 {
+      color: #495057;
+      margin: 0;
+      font-weight: 600;
+      
+      i {
+        color: #007bff;
+      }
+    }
+  }
+
+  .no-reviews {
+    padding: 2rem 0;
+    
+    i {
+      color: #dee2e6;
+    }
+    
+    p {
+      font-size: 1.1rem;
+    }
+  }
+
+  .reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .review-item {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+  }
+
+  .reviewer-details {
+    .reviewer-name {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.25rem;
+    }
+    
+    .review-date {
+      font-size: 0.875rem;
+      color: #6c757d;
+      
+      i {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .review-status {
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 500;
+      
+      &.badge-success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      
+      &.badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      
+      &.badge-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      
+      &.badge-secondary {
+        background-color: #e2e3e5;
+        color: #383d41;
+      }
+    }
+  }
+
+  .review-rating {
+    margin-bottom: 1rem;
+  }
+
+  .review-comment {
+    .comment-text {
+      color: #495057;
+      line-height: 1.6;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  .review-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f8f9fa;
+    
+    .moderator-notes {
+      background: #f8f9fa;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+      
+      small {
+        font-size: 0.875rem;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .load-more {
+    text-align: center;
+    margin-top: 1rem;
+    
+    .btn {
+      border-radius: 20px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+      }
+    }
+  }
+}
+
+// Animations
+.review-item {
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.review-item:nth-child(1) { animation-delay: 0.1s; }
+.review-item:nth-child(2) { animation-delay: 0.2s; }
+.review-item:nth-child(3) { animation-delay: 0.3s; }
+.review-item:nth-child(4) { animation-delay: 0.4s; }
+.review-item:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .review-list {
+    .review-item {
+      padding: 1rem;
+    }
+    
+    .review-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    
+    .reviewer-info {
+      gap: 0.5rem;
+    }
+    
+    .reviewer-avatar {
+      width: 35px;
+      height: 35px;
+      font-size: 0.875rem;
+    }
+    
+    .reviewer-details {
+      .reviewer-name {
+        font-size: 0.95rem;
+      }
+      
+      .review-date {
+        font-size: 0.8rem;
+      }
+    }
+  }
+} 

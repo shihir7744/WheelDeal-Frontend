@@ -1,0 +1,148 @@
+<div class="image-upload-container">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-cloud-upload-alt me-2"></i>
+        Upload Car Image
+      </h5>
+    </div>
+    <div class="card-body">
+      <!-- Error Alert -->
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button type="button" class="btn-close" (click)="clearError()"></button>
+      </div>
+
+      <!-- Success Alert -->
+      <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        {{ success }}
+        <button type="button" class="btn-close" (click)="clearSuccess()"></button>
+      </div>
+
+      <!-- Upload Progress -->
+      <div *ngIf="isUploading" class="upload-progress mb-3">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" 
+               [style.width.%]="uploadProgress" 
+               role="progressbar" 
+               [attr.aria-valuenow]="uploadProgress" 
+               aria-valuemin="0" 
+               aria-valuemax="100">
+            {{ uploadProgress }}%
+          </div>
+        </div>
+        <small class="text-muted">Uploading image...</small>
+      </div>
+
+      <form [formGroup]="uploadForm" (ngSubmit)="uploadImage()">
+        <!-- File Selection -->
+        <div class="mb-3">
+          <label for="fileInput" class="form-label">Select Image File</label>
+          <input type="file" 
+                 id="fileInput"
+                 class="form-control" 
+                 accept="image/*"
+                 (change)="onFileSelected($event)"
+                 [disabled]="isUploading">
+          <div class="form-text">
+            Supported formats: JPEG, PNG, GIF, WebP. Maximum size: 10MB
+          </div>
+        </div>
+
+        <!-- Selected File Info -->
+        <div *ngIf="selectedFile" class="mb-3">
+          <div class="selected-file-info">
+            <i class="fas fa-image me-2"></i>
+            <strong>{{ selectedFile.name }}</strong>
+            <span class="text-muted ms-2">({{ formatFileSize(selectedFile.size) }})</span>
+          </div>
+        </div>
+
+        <!-- Image Type -->
+        <div class="mb-3">
+          <label for="imageType" class="form-label">Image Type</label>
+          <select id="imageType" 
+                  class="form-select" 
+                  formControlName="imageType"
+                  [disabled]="isUploading">
+            <option *ngFor="let type of imageTypes" [value]="type">
+              {{ getImageTypeDisplayName(type) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Primary Image Checkbox -->
+        <div class="mb-3">
+          <div class="form-check">
+            <input type="checkbox" 
+                   id="isPrimary" 
+                   class="form-check-input" 
+                   formControlName="isPrimary"
+                   [disabled]="isUploading">
+            <label class="form-check-label" for="isPrimary">
+              Set as primary image
+            </label>
+          </div>
+        </div>
+
+        <!-- Sort Order -->
+        <div class="mb-3">
+          <label for="sortOrder" class="form-label">Sort Order</label>
+          <input type="number" 
+                 id="sortOrder" 
+                 class="form-control" 
+                 formControlName="sortOrder"
+                 placeholder="Leave empty for auto-assignment"
+                 [disabled]="isUploading">
+        </div>
+
+        <!-- Alt Text -->
+        <div class="mb-3">
+          <label for="altText" class="form-label">Alt Text</label>
+          <input type="text" 
+                 id="altText" 
+                 class="form-control" 
+                 formControlName="altText"
+                 placeholder="Alternative text for accessibility"
+                 [disabled]="isUploading">
+          <div class="form-text">
+            Maximum 255 characters
+          </div>
+        </div>
+
+        <!-- Caption -->
+        <div class="mb-3">
+          <label for="caption" class="form-label">Caption</label>
+          <textarea id="caption" 
+                    class="form-control" 
+                    formControlName="caption"
+                    rows="3"
+                    placeholder="Optional caption for the image"
+                    [disabled]="isUploading"></textarea>
+          <div class="form-text">
+            Maximum 500 characters
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+          <button type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="!selectedFile || !uploadForm.valid || isUploading">
+            <i class="fas fa-upload me-2"></i>
+            {{ isUploading ? 'Uploading...' : 'Upload Image' }}
+          </button>
+          <button type="button" 
+                  class="btn btn-secondary"
+                  (click)="resetForm()"
+                  [disabled]="isUploading">
+            <i class="fas fa-undo me-2"></i>
+            Reset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,486 @@
+<!-- Loading Spinner -->
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="loading-spinner">
+    <i class="fas fa-spinner fa-spin fa-3x"></i>
+    <p>Loading amazing content...</p>
+  </div>
+</div>
+
+<!-- Error State -->
+<div class="error-overlay" *ngIf="!isLoading && !homeData">
+  <div class="error-content">
+    <i class="fas fa-exclamation-triangle fa-3x"></i>
+    <h3>Oops! Something went wrong</h3>
+    <p>We couldn't load the dynamic content. Please try again.</p>
+    <app-modern-button
+      text="Retry"
+      icon="fas fa-redo"
+      variant="primary"
+      size="md"
+      (click)="retryLoadData()"
+      [showRipple]="true"
+    ></app-modern-button>
+  </div>
+</div>
+
+<div class="modern-hero">
+  <!-- Animated Background Elements -->
+  <div class="hero-background">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+      <div class="shape shape-6"></div>
+    </div>
+    <div class="gradient-mesh"></div>
+    <div class="particle-field"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="container">
+      <div class="row align-items-center min-vh-100">
+        <div class="col-lg-6">
+          <div class="hero-text slide-in-left">
+            <div class="hero-badge">
+              <i class="fas fa-star"></i>
+              <span>Premium Car Rental Service</span>
+            </div>
+            
+            <h1 class="hero-title">
+              Experience Freedom with
+              <span class="text-gradient">WheelDeal Premium</span>
+            </h1>
+            
+            <p class="hero-description">
+              Unlock the road with our curated collection of premium vehicles. 
+              From sleek sedans to powerful SUVs, every journey becomes extraordinary.
+            </p>
+            
+            <div class="hero-stats">
+              <div class="stat-item" *ngFor="let stat of dynamicStats">
+                <div class="stat-number">{{ stat.number }}</div>
+                <div class="stat-label">{{ stat.label }}</div>
+              </div>
+            </div>
+            
+            <div class="hero-actions">
+              <app-modern-button
+                text="Search Cars"
+                icon="fas fa-search"
+                variant="primary"
+                size="lg"
+                routerLink="/cars"
+                [showRipple]="true"
+                class="hero-btn"
+              ></app-modern-button>
+              
+              <app-modern-button
+                *ngIf="!isLoggedIn"
+                text="Get Started"
+                icon="fas fa-user-plus"
+                variant="outline"
+                size="lg"
+                routerLink="/register"
+                [showRipple]="true"
+                class="hero-btn"
+              ></app-modern-button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <div class="hero-visual slide-in-right">
+            <div class="car-showcase">
+              <div class="car-model">
+                <div class="car-body">
+                  <div class="car-window"></div>
+                  <div class="car-wheel wheel-front"></div>
+                  <div class="car-wheel wheel-back"></div>
+                  <div class="car-headlight"></div>
+                  <div class="car-taillight"></div>
+                </div>
+              </div>
+              <div class="car-glow"></div>
+            </div>
+            
+            <div class="floating-cards">
+              <div class="floating-card card-1">
+                <i class="fas fa-shield-alt"></i>
+                <span>Secure</span>
+              </div>
+              <div class="floating-card card-2">
+                <i class="fas fa-clock"></i>
+                <span>24/7</span>
+              </div>
+              <div class="floating-card card-3">
+                <i class="fas fa-award"></i>
+                <span>Premium</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Top Rated Cars Section (moved up) -->
+<section class="top-rated-cars-section" *ngIf="topRatedCars.length > 0">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-badge">
+        <i class="fas fa-star" *ngIf="hasRatedCars"></i>
+        <i class="fas fa-car" *ngIf="!hasRatedCars"></i>
+        <span>{{ hasRatedCars ? 'Top Rated' : 'Available Cars' }}</span>
+      </div>
+      <h2 class="section-title">
+        <span *ngIf="hasRatedCars">Highest <span class="text-gradient">Rated Cars</span></span>
+        <span *ngIf="!hasRatedCars">Available <span class="text-gradient">Cars</span></span>
+      </h2>
+      <p class="section-description">
+        <span *ngIf="hasRatedCars">Experience the best-rated vehicles that our customers love the most</span>
+        <span *ngIf="!hasRatedCars">Explore our available vehicles ready for your next adventure</span>
+      </p>
+    </div>
+    
+    <div class="row g-4">
+      <div 
+        *ngFor="let car of topRatedCars; let i = index" 
+        class="col-lg-4 col-md-6"
+        [style.animation-delay]="(i * 0.1) + 's'"
+      >
+        <div class="car-card card h-100 bounce-in">
+          <div class="car-image">
+            <img [src]="getCarImageUrl(car)" [alt]="car.brand + ' ' + car.model" class="card-img-top">
+            <div class="car-badge">
+              <span class="badge bg-success" *ngIf="car.availability">Available</span>
+              <span class="badge bg-danger" *ngIf="!car.availability">Unavailable</span>
+              <span class="badge bg-warning" *ngIf="hasRatedCars && getAverageRating(car) >= 4.5">Top Rated</span>
+            </div>
+            <div class="favorite-overlay">
+              <button class="btn btn-light btn-sm favorite-btn">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-bold">
+              <a [routerLink]="['/cars', car.id]" class="text-decoration-none text-dark">
+                {{ car.brand }} {{ car.model }}
+              </a>
+            </h5>
+            <p class="card-text text-muted mb-2">
+              <i class="fas fa-calendar me-2"></i>{{ car.year }} • 
+              <i class="fas fa-car me-2"></i>{{ car.type }}
+            </p>
+            <p class="card-text text-muted mb-3">
+              <i class="fas fa-map-marker-alt me-2"></i>{{ car.branchCity }}
+            </p>
+            
+            <!-- Rating Display -->
+            <div class="rating-section mb-3" *ngIf="hasRatedCars && getAverageRating(car) > 0">
+              <div class="stars">
+                <i [class]="getStarClass(star)" *ngFor="let star of getStarRating(car)"></i>
+              </div>
+              <span class="rating-text">{{ getAverageRating(car) }} ({{ getRatingCount(car) }} reviews)</span>
+            </div>
+            
+            <div class="mt-auto">
+              <div class="price-section mb-3">
+                <span class="price-amount">${{ car.price }}</span>
+                <span class="price-period">/day</span>
+              </div>
+              
+              <button class="btn btn-primary w-100">
+                <i class="fas fa-calendar-plus me-2"></i>
+                {{ hasRatedCars ? 'Book Now' : 'Rent Now' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section-actions text-center">
+      <app-modern-button
+        text="View All Available Cars"
+        icon="fas fa-car"
+        variant="primary"
+        size="lg"
+        routerLink="/cars"
+        [showRipple]="true"
+      ></app-modern-button>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Cars Section -->
+<section class="featured-cars-section" *ngIf="featuredCars.length > 0">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-badge">
+        <i class="fas fa-star"></i>
+        <span>Featured Cars</span>
+      </div>
+      <h2 class="section-title">
+        Our <span class="text-gradient">Featured Collection</span>
+      </h2>
+      <p class="section-description">
+        Discover our handpicked premium vehicles for an extraordinary driving experience
+      </p>
+    </div>
+    
+    <div class="row g-4">
+      <div 
+        *ngFor="let car of featuredCars.slice(0, 6); let i = index" 
+        class="col-lg-4 col-md-6"
+        [style.animation-delay]="(i * 0.1) + 's'"
+      >
+        <div class="car-card card h-100 bounce-in">
+          <div class="car-image">
+            <img [src]="getCarImageUrl(car)" [alt]="car.brand + ' ' + car.model" class="card-img-top">
+            <div class="car-badge">
+              <span class="badge bg-success" *ngIf="car.availability">Available</span>
+              <span class="badge bg-danger" *ngIf="!car.availability">Unavailable</span>
+            </div>
+            <div class="favorite-overlay">
+              <button class="btn btn-light btn-sm favorite-btn">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-bold">
+              <a [routerLink]="['/cars', car.id]" class="text-decoration-none text-dark">
+                {{ car.brand }} {{ car.model }}
+              </a>
+            </h5>
+            <p class="card-text text-muted mb-2">
+              <i class="fas fa-calendar me-2"></i>{{ car.year }} • 
+              <i class="fas fa-car me-2"></i>{{ car.type }}
+            </p>
+            <p class="card-text text-muted mb-3">
+              <i class="fas fa-map-marker-alt me-2"></i>{{ car.branchCity }}
+            </p>
+            
+            <!-- Rating Display -->
+            <div class="rating-section mb-3" *ngIf="getAverageRating(car) > 0">
+              <div class="stars">
+                <i [class]="getStarClass(star)" *ngFor="let star of getStarRating(car)"></i>
+              </div>
+              <span class="rating-text">{{ getAverageRating(car) }} ({{ getRatingCount(car) }} reviews)</span>
+            </div>
+            
+            <div class="mt-auto">
+              <div class="price-section mb-3">
+                <span class="price-amount">${{ car.price }}</span>
+                <span class="price-period">/day</span>
+              </div>
+              
+              <button class="btn btn-primary w-100">
+                <i class="fas fa-calendar-plus me-2"></i>
+                Book Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section-actions text-center">
+      <app-modern-button
+        text="View All Cars"
+        icon="fas fa-car"
+        variant="primary"
+        size="lg"
+        routerLink="/cars"
+        [showRipple]="true"
+      ></app-modern-button>
+    </div>
+  </div>
+</section>
+
+<!-- Popular Cars Section -->
+<section class="popular-cars-section" *ngIf="popularCars.length > 0">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-badge">
+        <i class="fas fa-fire"></i>
+        <span>Popular Choices</span>
+      </div>
+      <h2 class="section-title">
+        Most <span class="text-gradient">Popular Cars</span>
+      </h2>
+      <p class="section-description">
+        Our customers' favorite vehicles that are always in high demand
+      </p>
+    </div>
+    
+    <div class="row g-4">
+      <div 
+        *ngFor="let car of popularCars.slice(0, 6); let i = index" 
+        class="col-lg-4 col-md-6"
+        [style.animation-delay]="(i * 0.1) + 's'"
+      >
+        <div class="car-card card h-100 bounce-in">
+          <div class="car-image">
+            <img [src]="getCarImageUrl(car)" [alt]="car.brand + ' ' + car.model" class="card-img-top">
+            <div class="car-badge">
+              <span class="badge bg-success" *ngIf="car.availability">Available</span>
+              <span class="badge bg-danger" *ngIf="!car.availability">Unavailable</span>
+            </div>
+            <div class="favorite-overlay">
+              <button class="btn btn-light btn-sm favorite-btn">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-bold">
+              <a [routerLink]="['/cars', car.id]" class="text-decoration-none text-dark">
+                {{ car.brand }} {{ car.model }}
+              </a>
+            </h5>
+            <p class="card-text text-muted mb-2">
+              <i class="fas fa-calendar me-2"></i>{{ car.year }} • 
+              <i class="fas fa-car me-2"></i>{{ car.type }}
+            </p>
+            <p class="card-text text-muted mb-3">
+              <i class="fas fa-map-marker-alt me-2"></i>{{ car.branchCity }}
+            </p>
+            
+            <!-- Rating Display -->
+            <div class="rating-section mb-3" *ngIf="getAverageRating(car) > 0">
+              <div class="stars">
+                <i [class]="getStarClass(star)" *ngFor="let star of getStarRating(car)"></i>
+              </div>
+              <span class="rating-text">{{ getAverageRating(car) }} ({{ getRatingCount(car) }} reviews)</span>
+            </div>
+            
+            <div class="mt-auto">
+              <div class="price-section mb-3">
+                <span class="price-amount">${{ car.price }}</span>
+                <span class="price-period">/day</span>
+              </div>
+              
+              <button class="btn btn-primary w-100">
+                <i class="fas fa-calendar-plus me-2"></i>
+                Book Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Section (moved down) -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-badge">
+        <i class="fas fa-star"></i>
+        <span>Why Choose Us</span>
+      </div>
+      <h2 class="section-title">
+        Why Choose <span class="text-gradient">WheelDeal</span>
+      </h2>
+      <p class="section-description">
+        Experience the perfect blend of luxury, convenience, and innovation
+      </p>
+    </div>
+    
+    <div class="features-grid">
+      <app-modern-card
+        *ngFor="let feature of features; let i = index"
+        class="feature-card"
+        [hoverable]="true"
+        [elevated]="true"
+        size="lg"
+      >
+        <div class="feature-content">
+          <div class="feature-icon">
+            <i [class]="feature.icon"></i>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+          <div class="feature-value" *ngIf="feature.dynamicValue">
+            <span class="value-number">{{ feature.dynamicValue }}</span>
+          </div>
+        </div>
+      </app-modern-card>
+    </div>
+  </div>
+</section>
+
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <app-modern-card
+        *ngFor="let stat of dynamicStats; let i = index"
+        class="stat-card"
+        [hoverable]="true"
+        variant="glass"
+        size="md"
+      >
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i [class]="stat.icon"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ stat.number }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        </div>
+      </app-modern-card>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <div class="cta-text">
+        <h2 class="cta-title">
+          Ready to <span class="text-gradient">Drive Your Dreams</span>?
+        </h2>
+        <p class="cta-description">
+          Join thousands of satisfied drivers who choose WheelDeal for their premium transportation experience.
+        </p>
+        <div class="cta-actions">
+          <app-modern-button
+            text="Book Your Car Now"
+            icon="fas fa-car"
+            variant="primary"
+            size="lg"
+            routerLink="/cars"
+            [showRipple]="true"
+          ></app-modern-button>
+          
+          <app-modern-button
+            *ngIf="!isLoggedIn"
+            text="Create Account"
+            icon="fas fa-user-plus"
+            variant="outline"
+            size="lg"
+            routerLink="/register"
+            [showRipple]="true"
+          ></app-modern-button>
+        </div>
+      </div>
+      
+      <div class="cta-visual">
+        <div class="cta-image">
+          <i class="fas fa-road"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

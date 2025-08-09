@@ -1,0 +1,161 @@
+<div class="email-test-container">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-envelope me-2"></i>
+              Email System Test Panel
+            </h3>
+            <p class="mb-0 mt-2">Test email templates and functionality</p>
+          </div>
+          
+          <div class="card-body">
+            <!-- Email Input Form -->
+            <form [formGroup]="testForm" class="mb-4">
+              <div class="row">
+                <div class="col-md-8">
+                  <label for="email" class="form-label">Test Email Address</label>
+                  <input 
+                    type="email" 
+                    id="email"
+                    formControlName="email" 
+                    class="form-control" 
+                    placeholder="Enter email address for testing"
+                  >
+                  <div *ngIf="testForm.get('email')?.invalid && testForm.get('email')?.touched" class="text-danger mt-1">
+                    <small *ngIf="testForm.get('email')?.errors?.['required']">Email is required</small>
+                    <small *ngIf="testForm.get('email')?.errors?.['email']">Please enter a valid email address</small>
+                  </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-secondary w-100"
+                    (click)="clearResults()"
+                  >
+                    <i class="fas fa-trash me-2"></i>Clear Results
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Test Buttons -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5>Email Templates</h5>
+                <div class="d-flex flex-wrap gap-2">
+                  <button 
+                    type="button" 
+                    class="btn btn-success"
+                    (click)="testBookingConfirmation()"
+                    [disabled]="isLoading || !testForm.valid"
+                  >
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Booking Confirmation
+                  </button>
+                  
+                  <button 
+                    type="button" 
+                    class="btn btn-info"
+                    (click)="testWelcomeEmail()"
+                    [disabled]="isLoading || !testForm.valid"
+                  >
+                    <i class="fas fa-hand-wave me-2"></i>
+                    Welcome Email
+                  </button>
+                  
+                  <button 
+                    type="button" 
+                    class="btn btn-warning"
+                    (click)="testBookingCancellation()"
+                    [disabled]="isLoading || !testForm.valid"
+                  >
+                    <i class="fas fa-calendar-times me-2"></i>
+                    Booking Cancellation
+                  </button>
+                  
+                  <button 
+                    type="button" 
+                    class="btn btn-danger"
+                    (click)="testPasswordReset()"
+                    [disabled]="isLoading || !testForm.valid"
+                  >
+                    <i class="fas fa-key me-2"></i>
+                    Password Reset
+                  </button>
+                  
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary"
+                    (click)="testBookingReminder()"
+                    [disabled]="isLoading || !testForm.valid"
+                  >
+                    <i class="fas fa-bell me-2"></i>
+                    Booking Reminder
+                  </button>
+                  
+                  <button 
+                    type="button" 
+                    class="btn btn-primary"
+                    (click)="testAllEmails()"
+                    [disabled]="isLoading || !testForm.valid"
+                  >
+                    <i class="fas fa-play me-2"></i>
+                    Test All
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div *ngIf="isLoading" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Sending email...</p>
+            </div>
+
+            <!-- Test Results -->
+            <div *ngIf="Object.keys(testResults).length > 0" class="mt-4">
+              <h5>Test Results</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3" *ngFor="let result of testResults | keyvalue">
+                  <div class="card" [ngClass]="result.value.success ? 'border-success' : 'border-danger'">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center mb-2">
+                        <i 
+                          class="fas me-2" 
+                          [ngClass]="result.value.success ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'"
+                        ></i>
+                        <h6 class="mb-0">{{ getTestName(result.key) }}</h6>
+                      </div>
+                      <p class="mb-0" [ngClass]="result.value.success ? 'text-success' : 'text-danger'">
+                        {{ result.value.message }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="mt-4">
+              <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle me-2"></i>Instructions</h6>
+                <ul class="mb-0">
+                  <li>Enter a valid email address to receive test emails</li>
+                  <li>Click individual buttons to test specific email templates</li>
+                  <li>Use "Test All" to send all email types at once</li>
+                  <li>Check the email inbox for received test emails</li>
+                  <li>Results will show success/failure status for each test</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

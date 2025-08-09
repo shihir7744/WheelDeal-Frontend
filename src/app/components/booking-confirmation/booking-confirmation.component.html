@@ -1,0 +1,251 @@
+<div class="booking-confirmation-container">
+  <div class="container py-4">
+    <!-- Page Header -->
+    <div class="page-header text-center mb-5">
+      <h1 class="display-5 fw-bold text-white mb-3">
+        <i class="fas fa-clipboard-check me-3"></i>
+        Booking Confirmation
+      </h1>
+      <p class="lead text-white-50">Review and manage pending booking requests</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-white mt-3">Loading pending bookings...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="text-center py-5">
+      <div class="error-icon mb-3">
+        <i class="fas fa-exclamation-triangle fa-4x text-warning"></i>
+      </div>
+      <h4 class="text-white">{{ error }}</h4>
+      <button class="btn btn-primary mt-3" (click)="loadPendingBookings()">
+        <i class="fas fa-redo me-2"></i>Try Again
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !error">
+      <!-- Stats -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+              <h3 class="mb-0">{{ pendingBookings.length }}</h3>
+              <p class="mb-0">Pending Bookings</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+              <h3 class="mb-0">{{ pendingBookings.length }}</h3>
+              <p class="mb-0">Awaiting Review</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-success text-white">
+            <div class="card-body text-center">
+              <h3 class="mb-0">0</h3>
+              <p class="mb-0">Processed Today</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="pendingBookings.length === 0" class="text-center py-5">
+        <div class="empty-state-icon mb-3">
+          <i class="fas fa-check-circle fa-4x text-success"></i>
+        </div>
+        <h4 class="text-white">No Pending Bookings</h4>
+        <p class="text-white-50">All booking requests have been processed!</p>
+        <button class="btn btn-primary btn-lg mt-3" (click)="loadPendingBookings()">
+          <i class="fas fa-sync me-2"></i>Refresh
+        </button>
+      </div>
+
+      <!-- Pending Bookings List -->
+      <div *ngIf="pendingBookings.length > 0" class="pending-bookings">
+        <div class="row g-4">
+          <div *ngFor="let booking of pendingBookings" class="col-lg-6">
+            <div class="card booking-card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                  <i class="fas fa-calendar-alt me-2"></i>
+                  Booking #{{ booking.id }}
+                </h5>
+                <span [class]="getStatusBadgeClass(booking.status)">
+                  {{ getStatusDisplayText(booking.status) }}
+                </span>
+              </div>
+              
+              <div class="card-body">
+                <!-- Customer Info -->
+                <div class="customer-info mb-3">
+                  <h6><i class="fas fa-user me-2"></i>Customer Information</h6>
+                  <p class="mb-1"><strong>Name:</strong> {{ booking.userFullName }}</p>
+                  <p class="mb-1"><strong>Email:</strong> {{ booking.userEmail }}</p>
+                  <p class="mb-0"><strong>Requested:</strong> {{ formatDate(booking.createdAt) }}</p>
+                </div>
+
+                <!-- Vehicle Info -->
+                <div class="vehicle-info mb-3">
+                  <h6><i class="fas fa-car me-2"></i>Vehicle Information</h6>
+                  <p class="mb-1"><strong>Vehicle:</strong> {{ booking.carBrand }} {{ booking.carModel }}</p>
+                  <p class="mb-1"><strong>Type:</strong> {{ booking.carType }}</p>
+                  <p class="mb-0"><strong>Duration:</strong> {{ getRentalDuration(booking.startDate, booking.endDate) }} days</p>
+                </div>
+
+                <!-- Rental Details -->
+                <div class="rental-details mb-3">
+                  <h6><i class="fas fa-calendar me-2"></i>Rental Details</h6>
+                  <p class="mb-1"><strong>Start Date:</strong> {{ formatDate(booking.startDate) }}</p>
+                  <p class="mb-1"><strong>End Date:</strong> {{ formatDate(booking.endDate) }}</p>
+                  <p class="mb-0"><strong>Total Amount:</strong> {{ calculateTotalAmount(booking) }}</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons d-flex gap-2">
+                  <button 
+                    class="btn btn-success flex-fill"
+                    (click)="openConfirmationModal(booking)"
+                  >
+                    <i class="fas fa-check me-2"></i>Confirm
+                  </button>
+                  <button 
+                    class="btn btn-danger flex-fill"
+                    (click)="openRejectionModal(booking)"
+                  >
+                    <i class="fas fa-times me-2"></i>Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal fade" [class.show]="showConfirmationModal" [style.display]="showConfirmationModal ? 'block' : 'none'">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-check-circle me-2"></i>
+            Confirm Booking
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModals()"></button>
+        </div>
+        <div class="modal-body" *ngIf="selectedBooking">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            You are about to confirm this booking request. The customer will receive a confirmation email.
+          </div>
+
+          <div class="booking-summary mb-3">
+            <h6>Booking Summary</h6>
+            <p><strong>Customer:</strong> {{ selectedBooking.userFullName }}</p>
+            <p><strong>Vehicle:</strong> {{ selectedBooking.carBrand }} {{ selectedBooking.carModel }}</p>
+            <p><strong>Dates:</strong> {{ formatDate(selectedBooking.startDate) }} - {{ formatDate(selectedBooking.endDate) }}</p>
+          </div>
+
+          <form [formGroup]="confirmationForm">
+            <div class="mb-3">
+              <label for="adminNotes" class="form-label">Admin Notes (Optional)</label>
+              <textarea 
+                id="adminNotes"
+                class="form-control"
+                formControlName="adminNotes"
+                rows="3"
+                placeholder="Add any notes about this confirmation..."
+              ></textarea>
+              <div class="form-text">These notes will be included in the confirmation email to the customer.</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModals()">
+            <i class="fas fa-times me-2"></i>Cancel
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-success"
+            [disabled]="actionInProgress || !confirmationForm.valid"
+            (click)="confirmBooking()"
+          >
+            <i class="fas fa-check me-2"></i>
+            {{ actionInProgress ? 'Confirming...' : 'Confirm Booking' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rejection Modal -->
+  <div class="modal fade" [class.show]="showRejectionModal" [style.display]="showRejectionModal ? 'block' : 'none'">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-times-circle me-2"></i>
+            Reject Booking
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModals()"></button>
+        </div>
+        <div class="modal-body" *ngIf="selectedBooking">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            You are about to reject this booking request. The customer will receive a rejection email.
+          </div>
+
+          <div class="booking-summary mb-3">
+            <h6>Booking Summary</h6>
+            <p><strong>Customer:</strong> {{ selectedBooking.userFullName }}</p>
+            <p><strong>Vehicle:</strong> {{ selectedBooking.carBrand }} {{ selectedBooking.carModel }}</p>
+            <p><strong>Dates:</strong> {{ formatDate(selectedBooking.startDate) }} - {{ formatDate(selectedBooking.endDate) }}</p>
+          </div>
+
+          <form [formGroup]="confirmationForm">
+            <div class="mb-3">
+              <label for="rejectionNotes" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+              <textarea 
+                id="rejectionNotes"
+                class="form-control"
+                formControlName="adminNotes"
+                rows="3"
+                placeholder="Please provide a reason for rejecting this booking..."
+                required
+              ></textarea>
+              <div class="form-text">This reason will be included in the rejection email to the customer.</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModals()">
+            <i class="fas fa-times me-2"></i>Cancel
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-danger"
+            [disabled]="actionInProgress || !confirmationForm.valid"
+            (click)="rejectBooking()"
+          >
+            <i class="fas fa-times me-2"></i>
+            {{ actionInProgress ? 'Rejecting...' : 'Reject Booking' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade show" *ngIf="showConfirmationModal || showRejectionModal"></div>
+</div> 

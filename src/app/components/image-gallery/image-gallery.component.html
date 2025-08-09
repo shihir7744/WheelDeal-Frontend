@@ -1,0 +1,118 @@
+<div class="image-gallery-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading images...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="alert alert-warning" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- No Images State -->
+  <div *ngIf="!isLoading && !error && images.length === 0" class="no-images-state">
+    <div class="text-center py-4">
+      <i class="fas fa-images fa-3x text-muted mb-3"></i>
+      <h5 class="text-muted">No Images Available</h5>
+      <p class="text-muted">This car doesn't have any images uploaded yet.</p>
+    </div>
+  </div>
+
+  <!-- Image Gallery -->
+  <div *ngIf="!isLoading && !error && images.length > 0" class="gallery-content">
+    <!-- Main Image Display -->
+    <div class="main-image-container">
+      <div class="main-image-wrapper">
+        <img [src]="getImageUrl(currentImage?.filePath || '')" 
+             [alt]="currentImage?.altText || 'Car image'"
+             class="main-image"
+             (error)="onImageError($event)">
+        
+        <!-- Navigation Controls -->
+        <div *ngIf="canNavigate" class="navigation-controls">
+          <button class="nav-btn nav-btn-prev" (click)="previousImage()" title="Previous Image">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="nav-btn nav-btn-next" (click)="nextImage()" title="Next Image">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Image Counter -->
+        <div *ngIf="hasMultipleImages" class="image-counter">
+          {{ currentImageIndex + 1 }} / {{ images.length }}
+        </div>
+
+        <!-- Image Actions -->
+        <div *ngIf="showControls" class="image-actions">
+          <button *ngIf="!currentImage?.isPrimary" 
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="setPrimaryImage(currentImage!)"
+                  title="Set as Primary">
+            <i class="fas fa-star"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger"
+                  (click)="deleteImage(currentImage!)"
+                  title="Delete Image">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Image Info -->
+      <div *ngIf="showImageInfo && currentImage" class="image-info">
+        <div class="info-row">
+          <span class="info-label">Type:</span>
+          <span class="badge" [ngClass]="getImageTypeBadgeClass(currentImage.imageType)">
+            {{ getImageTypeDisplayName(currentImage.imageType) }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Size:</span>
+          <span class="info-value">{{ formatFileSize(currentImage.fileSize) }}</span>
+        </div>
+        <div *ngIf="currentImage.altText" class="info-row">
+          <span class="info-label">Alt Text:</span>
+          <span class="info-value">{{ currentImage.altText }}</span>
+        </div>
+        <div *ngIf="currentImage.caption" class="info-row">
+          <span class="info-label">Caption:</span>
+          <span class="info-value">{{ currentImage.caption }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Uploaded:</span>
+          <span class="info-value">{{ currentImage.createdAt | date:'short' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thumbnail Navigation -->
+    <div *ngIf="hasMultipleImages" class="thumbnail-container">
+      <div class="thumbnail-scroll">
+        <div class="thumbnail-list">
+          <div *ngFor="let image of images; let i = index" 
+               class="thumbnail-item"
+               [class.active]="i === currentImageIndex"
+               [class.primary]="image.isPrimary"
+               (click)="selectImage(i)">
+            <img [src]="getImageUrl(image.filePath)" 
+                 [alt]="image.altText || 'Thumbnail'"
+                 class="thumbnail-image"
+                 (error)="onImageError($event)">
+            <div class="thumbnail-overlay">
+              <span *ngIf="image.isPrimary" class="primary-badge">
+                <i class="fas fa-star"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

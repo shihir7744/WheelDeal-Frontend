@@ -1,0 +1,18 @@
+.settings-page {
+  max-width: 900px;
+}
+:root[data-theme='light'] {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+}
+:root[data-theme='dark'] {
+  --bg: #111418;
+  --fg: #e8e8e8;
+}
+:root[data-density='comfortable'] {
+  --control-padding: 0.75rem 1rem;
+}
+:root[data-density='compact'] {
+  --control-padding: 0.35rem 0.6rem;
+}
+.form-control, .form-select, .btn { padding: var(--control-padding); }

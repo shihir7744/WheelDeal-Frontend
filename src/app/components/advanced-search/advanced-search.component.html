@@ -1,0 +1,285 @@
+<div class="advanced-search-container">
+  <div class="search-header">
+    <h4 class="mb-3">
+      <i class="fas fa-search me-2"></i>
+      Advanced Car Search
+    </h4>
+    
+    <div class="filter-toggle">
+      <button 
+        type="button" 
+        class="btn btn-outline-primary btn-sm"
+        (click)="toggleAdvancedFilters()"
+      >
+        <i class="fas" [class.fa-chevron-down]="!showAdvancedFilters" [class.fa-chevron-up]="showAdvancedFilters"></i>
+        {{ showAdvancedFilters ? 'Hide' : 'Show' }} Advanced Filters
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
+    <!-- Basic Filters -->
+    <div class="basic-filters">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Brand</label>
+          <select formControlName="brand" class="form-select">
+            <option value="">All Brands</option>
+            <option *ngFor="let brand of filterOptions.brands" [value]="brand">
+              {{ brand }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Model</label>
+          <input 
+            type="text" 
+            formControlName="model" 
+            class="form-control" 
+            placeholder="Enter model name"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Type</label>
+          <select formControlName="type" class="form-select">
+            <option value="">All Types</option>
+            <option *ngFor="let type of filterOptions.types" [value]="type">
+              {{ type }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">City</label>
+          <input 
+            type="text" 
+            formControlName="city" 
+            class="form-control" 
+            placeholder="Enter city name"
+          >
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Min Price ($)</label>
+          <input 
+            type="number" 
+            formControlName="minPrice" 
+            class="form-control" 
+            placeholder="0"
+            min="0"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Max Price ($)</label>
+          <input 
+            type="number" 
+            formControlName="maxPrice" 
+            class="form-control" 
+            placeholder="1000"
+            min="0"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Sort By</label>
+          <select formControlName="sortBy" class="form-select">
+            <option value="">No Sorting</option>
+            <option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Sort Order</label>
+          <select formControlName="sortOrder" class="form-select">
+            <option value="">Default</option>
+            <option *ngFor="let option of sortOrderOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced Filters (Collapsible) -->
+    <div class="advanced-filters" *ngIf="showAdvancedFilters">
+      <div class="advanced-filters-header">
+        <h6 class="mb-3">
+          <i class="fas fa-cogs me-2"></i>
+          Advanced Filters
+        </h6>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Fuel Type</label>
+          <select formControlName="fuelType" class="form-select">
+            <option value="">All Fuel Types</option>
+            <option *ngFor="let fuelType of filterOptions.fuelTypes" [value]="fuelType">
+              {{ fuelType }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Transmission</label>
+          <select formControlName="transmission" class="form-select">
+            <option value="">All Transmissions</option>
+            <option *ngFor="let transmission of filterOptions.transmissions" [value]="transmission">
+              {{ transmission }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Color</label>
+          <select formControlName="color" class="form-select">
+            <option value="">All Colors</option>
+            <option *ngFor="let color of filterOptions.colors" [value]="color">
+              {{ color }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Engine Size</label>
+          <select formControlName="engineSize" class="form-select">
+            <option value="">All Engine Sizes</option>
+            <option *ngFor="let engineSize of filterOptions.engineSizes" [value]="engineSize">
+              {{ engineSize }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Min Year</label>
+          <input 
+            type="number" 
+            formControlName="minYear" 
+            class="form-control" 
+            placeholder="2000"
+            min="1900"
+            max="2030"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Max Year</label>
+          <input 
+            type="number" 
+            formControlName="maxYear" 
+            class="form-control" 
+            placeholder="2024"
+            min="1900"
+            max="2030"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Min Seating Capacity</label>
+          <input 
+            type="number" 
+            formControlName="minSeatingCapacity" 
+            class="form-control" 
+            placeholder="2"
+            min="1"
+            max="20"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Max Seating Capacity</label>
+          <input 
+            type="number" 
+            formControlName="maxSeatingCapacity" 
+            class="form-control" 
+            placeholder="8"
+            min="1"
+            max="20"
+          >
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Min Rating</label>
+          <input 
+            type="number" 
+            formControlName="minRating" 
+            class="form-control" 
+            placeholder="3.0"
+            min="0"
+            max="5"
+            step="0.1"
+          >
+        </div>
+        
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-semibold">Min Rating Count</label>
+          <input 
+            type="number" 
+            formControlName="minRatingCount" 
+            class="form-control" 
+            placeholder="5"
+            min="0"
+          >
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <div class="form-check mt-4">
+            <input 
+              class="form-check-input" 
+              type="checkbox" 
+              formControlName="availableOnly" 
+              id="availableOnly"
+            >
+            <label class="form-check-label" for="availableOnly">
+              Show only available cars
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="filter-info">
+          <span class="badge bg-primary me-2" *ngIf="hasActiveFilters()">
+            {{ getActiveFilterCount() }} Active Filter{{ getActiveFilterCount() !== 1 ? 's' : '' }}
+          </span>
+        </div>
+        
+        <div class="action-buttons">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary me-2"
+            (click)="onClearFilters()"
+            [disabled]="!hasActiveFilters()"
+          >
+            <i class="fas fa-times me-1"></i>
+            Clear Filters
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="isLoading"
+          >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isLoading" class="fas fa-search me-1"></i>
+            {{ isLoading ? 'Searching...' : 'Search Cars' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div> 

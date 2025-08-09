@@ -1,0 +1,261 @@
+<div class="maintenance-container">
+  <div class="maintenance-header">
+    <h2><i class="fas fa-tools me-2"></i>Car Maintenance & Service History</h2>
+    <p class="text-muted">Track and manage maintenance records for the rental fleet</p>
+  </div>
+
+  <!-- Overdue Maintenance Alert -->
+  <div *ngIf="overdueRecords.length > 0" class="alert alert-warning" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Overdue Maintenance:</strong> {{ overdueRecords.length }} car(s) have overdue maintenance scheduled.
+    <button class="btn btn-sm btn-outline-warning ms-2" (click)="loadOverdueMaintenance()">
+      <i class="fas fa-refresh"></i> Refresh
+    </button>
+  </div>
+
+  <!-- Car Selection -->
+  <div class="car-selection-section">
+    <div class="row">
+      <div class="col-md-6">
+        <label for="carSelect" class="form-label">Select Car</label>
+        <select id="carSelect" class="form-select" (change)="onCarSelectionChange($event)">
+          <option value="">Choose a car...</option>
+          <option *ngFor="let car of cars" [value]="car.id">
+            {{ car.brand }} {{ car.model }} ({{ car.year }})
+          </option>
+        </select>
+      </div>
+      <div class="col-md-6 d-flex align-items-end">
+        <button class="btn btn-primary" (click)="showAddMaintenanceForm()" [disabled]="!selectedCarId">
+          <i class="fas fa-plus me-2"></i>Add Maintenance Record
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Car Info -->
+  <div *ngIf="getSelectedCar()" class="selected-car-info">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-car me-2"></i>
+          {{ getSelectedCar()?.brand }} {{ getSelectedCar()?.model }} ({{ getSelectedCar()?.year }})
+        </h5>
+        <p class="card-text">
+          <strong>Type:</strong> {{ getSelectedCar()?.type }} | 
+          <strong>Mileage:</strong> {{ getSelectedCar()?.mileage || 'N/A' }} km
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Maintenance Form -->
+  <div *ngIf="showAddForm" class="add-maintenance-form">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-plus-circle me-2"></i>Add New Maintenance Record
+        </h5>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="maintenanceForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="maintenanceType" class="form-label">Maintenance Type *</label>
+                <select id="maintenanceType" class="form-select" formControlName="maintenanceType">
+                  <option value="">Select type...</option>
+                  <option *ngFor="let type of maintenanceTypes" [value]="type">
+                    {{ getMaintenanceTypeLabel(type) }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="serviceProvider" class="form-label">Service Provider *</label>
+                <input type="text" id="serviceProvider" class="form-control" formControlName="serviceProvider">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="serviceDate" class="form-label">Service Date *</label>
+                <input type="date" id="serviceDate" class="form-control" formControlName="serviceDate">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="nextServiceDate" class="form-label">Next Service Date</label>
+                <input type="date" id="nextServiceDate" class="form-control" formControlName="nextServiceDate">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="mileageAtService" class="form-label">Mileage at Service</label>
+                <input type="number" id="mileageAtService" class="form-control" formControlName="mileageAtService">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="cost" class="form-label">Cost</label>
+                <input type="number" id="cost" class="form-control" formControlName="cost" step="0.01">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="invoiceNumber" class="form-label">Invoice Number</label>
+                <input type="text" id="invoiceNumber" class="form-control" formControlName="invoiceNumber">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="laborHours" class="form-label">Labor Hours</label>
+                <input type="number" id="laborHours" class="form-control" formControlName="laborHours" step="0.5">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="partsReplaced" class="form-label">Parts Replaced</label>
+            <textarea id="partsReplaced" class="form-control" rows="2" formControlName="partsReplaced"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="technicianNotes" class="form-label">Technician Notes</label>
+            <textarea id="technicianNotes" class="form-control" rows="3" formControlName="technicianNotes"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select id="status" class="form-select" formControlName="status">
+                  <option *ngFor="let status of maintenanceStatuses" [value]="status">
+                    {{ getMaintenanceStatusLabel(status) }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <div class="form-check mt-4">
+                  <input type="checkbox" id="warrantyCovered" class="form-check-input" formControlName="warrantyCovered">
+                  <label for="warrantyCovered" class="form-check-label">Warranty Covered</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="!maintenanceForm.valid || isLoading">
+              <i class="fas fa-save me-2"></i>
+              {{ isLoading ? 'Saving...' : 'Save Record' }}
+            </button>
+            <button type="button" class="btn btn-secondary ms-2" (click)="hideAddForm()">
+              <i class="fas fa-times me-2"></i>Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading maintenance records...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Maintenance Records List -->
+  <div *ngIf="maintenanceRecords.length > 0 && !isLoading" class="maintenance-records">
+    <h4 class="mb-3">
+      <i class="fas fa-history me-2"></i>Maintenance History
+      <span class="badge bg-secondary ms-2">{{ maintenanceRecords.length }} records</span>
+    </h4>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Type</th>
+            <th>Service Provider</th>
+            <th>Service Date</th>
+            <th>Next Service</th>
+            <th>Cost</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of maintenanceRecords">
+            <td>
+              <i [class]="getMaintenanceTypeIcon(record.maintenanceType)" class="me-2"></i>
+              {{ getMaintenanceTypeLabel(record.maintenanceType) }}
+            </td>
+            <td>{{ record.serviceProvider }}</td>
+            <td>{{ formatDate(record.serviceDate) }}</td>
+            <td>{{ formatDate(record.nextServiceDate || '') }}</td>
+            <td>{{ formatCost(record.cost) }}</td>
+            <td>
+              <span class="badge" [class]="'bg-' + getStatusColor(record.status)">
+                {{ getMaintenanceStatusLabel(record.status) }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-info" title="View Details">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="maintenanceRecords.length === 0 && selectedCarId && !isLoading" class="empty-state">
+    <div class="text-center">
+      <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+      <h5>No Maintenance Records</h5>
+      <p class="text-muted">No maintenance records found for this car.</p>
+      <button class="btn btn-primary" (click)="showAddMaintenanceForm()">
+        <i class="fas fa-plus me-2"></i>Add First Record
+      </button>
+    </div>
+  </div>
+
+  <!-- No Car Selected State -->
+  <div *ngIf="!selectedCarId && !isLoading" class="no-selection-state">
+    <div class="text-center">
+      <i class="fas fa-car fa-3x text-muted mb-3"></i>
+      <h5>Select a Car</h5>
+      <p class="text-muted">Please select a car from the dropdown above to view its maintenance history.</p>
+    </div>
+  </div>
+</div> 

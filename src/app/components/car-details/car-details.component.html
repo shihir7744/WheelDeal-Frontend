@@ -1,0 +1,148 @@
+<div class="car-details-container">
+  <div class="container py-4">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner"></div>
+      <p class="text-white mt-3">Loading car details...</p>
+    </div>
+
+    <!-- Car Details -->
+    <div *ngIf="!isLoading && car" class="car-details">
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/cars" class="text-decoration-none">
+              <i class="fas fa-chevron-left me-1"></i>Back to Cars
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ car.brand }} {{ car.model }}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Car Header -->
+      <div class="car-header card mb-4">
+        <div class="card-body p-4">
+          <div class="row">
+            <div class="col-md-6">
+              <img 
+                [src]="getCarImage(car)" 
+                [alt]="car.brand + ' ' + car.model" 
+                class="car-image img-fluid rounded"
+              >
+            </div>
+            <div class="col-md-6">
+              <div class="car-info">
+                <h1 class="car-title mb-3">{{ car.brand }} {{ car.model }}</h1>
+                
+                <div class="car-meta mb-3">
+                  <span class="badge bg-primary me-2">{{ car.year }}</span>
+                  <span class="badge bg-secondary me-2">{{ car.type }}</span>
+                  <span class="badge" [ngClass]="car.availability ? 'bg-success' : 'bg-danger'">
+                    {{ car.availability ? 'Available' : 'Unavailable' }}
+                  </span>
+                </div>
+
+                <div class="car-location mb-3">
+                  <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                  <span class="text-muted">{{ car.branchName }}, {{ car.branchCity }}</span>
+                </div>
+
+                <!-- Rating Display -->
+                <div class="rating-section mb-4" *ngIf="car.averageRating">
+                  <h6 class="fw-semibold mb-2">Customer Rating</h6>
+                  <app-star-rating
+                    [rating]="car.averageRating"
+                    [readonly]="true"
+                    size="lg"
+                    [showValue]="true"
+                    [showCount]="true"
+                    [ratingCount]="car.ratingCount || 0"
+                  ></app-star-rating>
+                </div>
+
+                <!-- User Rating (if logged in) -->
+                <div class="user-rating mb-4" *ngIf="isLoggedIn">
+                  <h6 class="fw-semibold mb-2">Your Rating</h6>
+                  <app-star-rating
+                    [rating]="userRating?.rating || 0"
+                    [readonly]="false"
+                    size="lg"
+                    (ratingChange)="onRatingChange($event)"
+                  ></app-star-rating>
+                  <small class="text-muted">Click to rate this car</small>
+                </div>
+
+                <!-- Price and Booking -->
+                <div class="price-section mb-4">
+                  <div class="price-display">
+                    <span class="price-amount">${{ car.price }}</span>
+                    <span class="price-period">/day</span>
+                  </div>
+                  <button 
+                    class="btn btn-primary btn-lg w-100" 
+                    [disabled]="!car.availability"
+                    (click)="bookCar()"
+                  >
+                    <i class="fas fa-calendar-plus me-2"></i>
+                    {{ car.availability ? 'Book This Car' : 'Currently Unavailable' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="reviews-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="mb-0">
+            <i class="fas fa-comments me-2"></i>
+            Customer Reviews
+            <span class="badge bg-primary ms-2">{{ reviews.length }}</span>
+          </h3>
+          <button 
+            class="btn btn-outline-primary"
+            (click)="toggleReviewForm()"
+            *ngIf="isLoggedIn"
+          >
+            <i class="fas fa-edit me-2"></i>
+            {{ userReview ? 'Edit Review' : 'Write Review' }}
+          </button>
+        </div>
+
+        <!-- Review Form -->
+        <div class="review-form-container mb-4" *ngIf="showReviewForm">
+          <app-review-form
+            [carId]="car.id"
+            [existingReview]="userReview"
+            (reviewSubmitted)="onReviewSubmitted($event)"
+            (reviewCancelled)="onReviewCancelled()"
+          ></app-review-form>
+        </div>
+
+        <!-- Reviews List -->
+        <app-review-list
+          [reviews]="reviews"
+          [showUserInfo]="true"
+          [showDate]="true"
+        ></app-review-list>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && !car" class="text-center py-5">
+      <div class="error-icon mb-3">
+        <i class="fas fa-car-crash fa-4x text-white-50"></i>
+      </div>
+      <h4 class="text-white">Car not found</h4>
+      <p class="text-white-50">The car you're looking for doesn't exist or has been removed.</p>
+      <a routerLink="/cars" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Cars
+      </a>
+    </div>
+  </div>
+</div> 

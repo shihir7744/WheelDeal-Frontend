@@ -1,0 +1,176 @@
+<div class="login-container">
+  <!-- Animated Background -->
+  <div class="login-background">
+    <div class="animated-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+      <div class="shape shape-6"></div>
+    </div>
+    <div class="gradient-mesh"></div>
+    <div class="particle-field"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="login-content">
+    <div class="container">
+      <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+          
+          <!-- Modern Login Card -->
+          <app-modern-card 
+            class="login-card-wrapper"
+            [hoverable]="true"
+            [elevated]="true"
+            variant="glass"
+            size="lg"
+          >
+            <!-- Card Header -->
+            <div class="login-header" header>
+              <div class="brand-section">
+                <div class="brand-icon">
+                  <div class="icon-wrapper">
+                    <i class="fas fa-car-side"></i>
+                  </div>
+                </div>
+                <div class="brand-text">
+                  <h1 class="brand-title">Welcome Back</h1>
+                  <p class="brand-subtitle">Sign in to your WheelDeal Premium account</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Login Form -->
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+              
+              <!-- Email Field -->
+              <div class="form-field">
+                <app-modern-input
+                  label="Email Address"
+                  type="email"
+                  placeholder="Enter your email address"
+                  icon="fas fa-envelope"
+                  formControlName="email"
+                  [errorMessage]="getFieldError('email')"
+                  size="lg"
+                  variant="outline"
+                ></app-modern-input>
+              </div>
+
+              <!-- Password Field -->
+              <div class="form-field">
+                <app-modern-input
+                  label="Password"
+                  type="password"
+                  placeholder="Enter your password"
+                  icon="fas fa-lock"
+                  formControlName="password"
+                  [errorMessage]="getFieldError('password')"
+                  [showPasswordToggle]="true"
+                  size="lg"
+                  variant="outline"
+                ></app-modern-input>
+              </div>
+
+              <!-- Form Options -->
+              <div class="form-options">
+                <div class="remember-me">
+                  <label class="checkbox-wrapper">
+                    <input type="checkbox" class="modern-checkbox" id="rememberMe">
+                    <span class="checkmark"></span>
+                    <span class="label-text">Remember me</span>
+                  </label>
+                </div>
+                <a href="#" class="forgot-link">Forgot password?</a>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="submit-section">
+                <app-modern-button
+                  text="Sign In"
+                  loadingText="Signing In..."
+                  icon="fas fa-sign-in-alt"
+                  variant="primary"
+                  size="lg"
+                  type="submit"
+                  [loading]="isLoading"
+                  [disabled]="loginForm.invalid"
+                  (onClick)="onSubmit()"
+                  [showRipple]="true"
+                ></app-modern-button>
+              </div>
+
+              <!-- Error Message -->
+              <div class="error-section" *ngIf="errorMessage">
+                <div class="error-card">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <span>{{ errorMessage }}</span>
+                </div>
+              </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider-section">
+              <div class="divider-line"></div>
+              <span class="divider-text">or continue with</span>
+              <div class="divider-line"></div>
+            </div>
+
+            <!-- Social Login -->
+            <div class="social-section">
+              <app-modern-button
+                text="Continue with Google"
+                icon="fab fa-google"
+                variant="outline"
+                size="lg"
+                (onClick)="loginWithGoogle()"
+                [showRipple]="true"
+                class="social-btn google-btn"
+              ></app-modern-button>
+              
+              <app-modern-button
+                text="Continue with Facebook"
+                icon="fab fa-facebook-f"
+                variant="outline"
+                size="lg"
+                (onClick)="loginWithFacebook()"
+                [showRipple]="true"
+                class="social-btn facebook-btn"
+              ></app-modern-button>
+            </div>
+
+            <!-- Footer -->
+            <div class="login-footer" footer>
+              <div class="footer-content">
+                <p class="signup-text">
+                  Don't have an account? 
+                  <a routerLink="/register" class="signup-link">Create one here</a>
+                </p>
+                <a routerLink="/home" class="back-link">
+                  <i class="fas fa-arrow-left"></i>
+                  <span>Back to Home</span>
+                </a>
+              </div>
+            </div>
+
+          </app-modern-card>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <app-modern-loading
+    *ngIf="isLoading"
+    text="Authenticating..."
+    subtext="Please wait while we verify your credentials"
+    spinnerType="ring"
+    variant="primary"
+    [overlay]="true"
+    [fullscreen]="true"
+  ></app-modern-loading>
+</div>
+

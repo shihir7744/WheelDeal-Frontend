@@ -1,0 +1,259 @@
+<div class="enhanced-car-details-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading car details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class="fas fa-arrow-left me-2"></i>
+      Go Back
+    </button>
+  </div>
+
+  <!-- Car Details Content -->
+  <div *ngIf="!isLoading && !error && car" class="car-details-content">
+    <!-- Header -->
+    <div class="car-header">
+      <button class="btn btn-outline-secondary" (click)="goBack()">
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Cars
+      </button>
+      
+      <div class="car-title">
+        <h1>{{ car.brand }} {{ car.model }}</h1>
+        <p class="text-muted">{{ car.year }} • {{ car.type }}</p>
+      </div>
+      
+      <div class="car-badges">
+        <span *ngIf="car.isFeatured" class="badge bg-warning text-dark me-2">
+          <i class="fas fa-star me-1"></i>Featured
+        </span>
+        <span *ngIf="car.isNewArrival" class="badge bg-success me-2">
+          <i class="fas fa-plus me-1"></i>New Arrival
+        </span>
+        <span *ngIf="car.isPopular" class="badge bg-info me-2">
+          <i class="fas fa-fire me-1"></i>Popular
+        </span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs-container">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" 
+                  [class.active]="activeTab === 'overview'"
+                  (click)="setActiveTab('overview')">
+            <i class="fas fa-info-circle me-2"></i>
+            Overview
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" 
+                  [class.active]="activeTab === 'specifications'"
+                  (click)="setActiveTab('specifications')">
+            <i class="fas fa-cogs me-2"></i>
+            Specifications
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" 
+                  [class.active]="activeTab === 'features'"
+                  (click)="setActiveTab('features')">
+            <i class="fas fa-list-check me-2"></i>
+            Features
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" 
+                  [class.active]="activeTab === 'rental'"
+                  (click)="setActiveTab('rental')">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Rental Info
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Overview Tab -->
+      <div *ngIf="activeTab === 'overview'" class="tab-pane active">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-car me-2"></i>Vehicle Information</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Brand:</strong> {{ car.brand }}</p>
+                    <p><strong>Model:</strong> {{ car.model }}</p>
+                    <p><strong>Year:</strong> {{ car.year }}</p>
+                    <p><strong>Type:</strong> {{ car.type }}</p>
+                    <p><strong>Color:</strong> {{ car.color || 'N/A' }}</p>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Fuel Type:</strong> {{ car.fuelType || 'N/A' }}</p>
+                    <p><strong>Transmission:</strong> {{ car.transmission || 'N/A' }}</p>
+                    <p><strong>Seating:</strong> {{ car.seatingCapacity || 'N/A' }} persons</p>
+                    <p><strong>Mileage:</strong> {{ car.mileage || 'N/A' }} miles</p>
+                    <p><strong>Engine:</strong> {{ car.engineSize || 'N/A' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-star me-2"></i>Ratings</h5>
+              </div>
+              <div class="card-body text-center">
+                <div class="rating-display">
+                  <div class="rating-number">{{ car.averageRating || 0 }}</div>
+                  <div class="rating-stars">
+                    <i *ngFor="let star of [1,2,3,4,5]" 
+                       class="fas fa-star"
+                       [class.text-warning]="star <= (car.averageRating || 0)"
+                       [class.text-muted]="star > (car.averageRating || 0)"></i>
+                  </div>
+                  <p class="text-muted">Based on {{ car.ratingCount || 0 }} reviews</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card mt-3">
+              <div class="card-header">
+                <h5><i class="fas fa-map-marker-alt me-2"></i>Location</h5>
+              </div>
+              <div class="card-body">
+                <p><strong>Branch:</strong> {{ car.branchName }}</p>
+                <p><strong>City:</strong> {{ car.branchCity }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specifications Tab -->
+      <div *ngIf="activeTab === 'specifications'" class="tab-pane active">
+        <div class="row">
+          <div *ngFor="let section of specificationSections" class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h5><i [class]="section.icon + ' me-2'"></i>{{ section.title }}</h5>
+              </div>
+              <div class="card-body">
+                <div *ngFor="let spec of section.specifications" class="specification-item">
+                  <div class="spec-label">{{ spec.label }}</div>
+                  <div class="spec-value">
+                    <span class="badge" [ngClass]="getBadgeClass(spec.value)">
+                      {{ formatValue(spec.value, spec.unit) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Tab -->
+      <div *ngIf="activeTab === 'features'" class="tab-pane active">
+        <div class="row">
+          <div *ngFor="let section of featureSections" class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-header" [style.border-left-color]="section.color">
+                <h5><i [class]="section.icon + ' me-2'"></i>{{ section.title }}</h5>
+              </div>
+              <div class="card-body">
+                <div *ngIf="section.features.length > 0; else noFeatures" class="features-list">
+                  <div *ngFor="let feature of section.features" class="feature-item">
+                    <i class="fas fa-check text-success me-2"></i>
+                    {{ feature }}
+                  </div>
+                </div>
+                <ng-template #noFeatures>
+                  <p class="text-muted">No {{ section.title.toLowerCase() }} information available.</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rental Info Tab -->
+      <div *ngIf="activeTab === 'rental'" class="tab-pane active">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-dollar-sign me-2"></i>Rental Rates</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="rate-card">
+                      <div class="rate-label">Daily Rate</div>
+                      <div class="rate-value">${{ car.dailyRate || 'N/A' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="rate-card">
+                      <div class="rate-label">Weekly Rate</div>
+                      <div class="rate-value">${{ car.weeklyRate || 'N/A' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="rate-card">
+                      <div class="rate-label">Monthly Rate</div>
+                      <div class="rate-value">${{ car.monthlyRate || 'N/A' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Rental Policies</h5>
+              </div>
+              <div class="card-body">
+                <div class="policy-item">
+                  <i class="fas fa-shield-alt text-success me-2"></i>
+                  <span>Insurance: {{ car.insuranceIncluded ? 'Included' : 'Not Included' }}</span>
+                </div>
+                <div class="policy-item">
+                  <i class="fas fa-tools text-info me-2"></i>
+                  <span>Maintenance: {{ car.maintenanceIncluded ? 'Included' : 'Not Included' }}</span>
+                </div>
+                <div class="policy-item">
+                  <i class="fas fa-road text-warning me-2"></i>
+                  <span>Mileage: {{ car.unlimitedMileage ? 'Unlimited' : 'Limited' }}</span>
+                </div>
+                <div class="policy-item">
+                  <i class="fas fa-user text-primary me-2"></i>
+                  <span>Age: {{ car.ageRequirement || 21 }}+ years</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

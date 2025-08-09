@@ -1,0 +1,126 @@
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Font Awesome 5 Free', sans-serif;
+}
+
+.stars-container {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.stars-container i {
+  transition: all 0.2s ease;
+  cursor: default;
+  
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.star-filled {
+  color: #ffc107;
+  font-weight: 900;
+}
+
+.star-partial {
+  color: #ffc107;
+  font-weight: 900;
+}
+
+.star-empty {
+  color: #e4e5e9;
+  font-weight: 400;
+}
+
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: #495057;
+}
+
+.rating-count {
+  color: #6c757d;
+}
+
+// Size variants
+.star-rating-sm {
+  .stars-container i {
+    font-size: 0.875rem;
+  }
+  
+  .rating-info {
+    font-size: 0.75rem;
+  }
+}
+
+.star-rating-md {
+  .stars-container i {
+    font-size: 1rem;
+  }
+  
+  .rating-info {
+    font-size: 0.875rem;
+  }
+}
+
+.star-rating-lg {
+  .stars-container i {
+    font-size: 1.25rem;
+  }
+  
+  .rating-info {
+    font-size: 1rem;
+  }
+}
+
+// Hover effects
+.stars-container i.clickable:hover {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+// Animation for rating changes
+.stars-container i {
+  animation: starPop 0.3s ease-out;
+}
+
+@keyframes starPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .star-rating {
+    gap: 0.25rem;
+  }
+  
+  .stars-container {
+    gap: 0.0625rem;
+  }
+  
+  .rating-info {
+    font-size: 0.75rem;
+  }
+} 

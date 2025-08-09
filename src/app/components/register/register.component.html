@@ -1,0 +1,199 @@
+<div class="register-container">
+  <!-- Animated Background -->
+  <div class="register-background">
+    <div class="animated-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+      <div class="shape shape-6"></div>
+    </div>
+    <div class="gradient-mesh"></div>
+    <div class="particle-field"></div>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-lg-6 col-md-8 col-sm-10">
+        
+        <!-- Modern Registration Card -->
+        <app-modern-card 
+          class="register-card-wrapper"
+          [hoverable]="true"
+          [elevated]="true"
+          size="lg"
+        >
+          <!-- Card Header -->
+          <div class="register-header" header>
+            <div class="brand-section">
+              <div class="brand-icon">
+                <div class="icon-wrapper">
+                  <i class="fas fa-user-plus"></i>
+                </div>
+              </div>
+              <div class="brand-text">
+                <h1 class="brand-title">Join WheelDeal</h1>
+                <p class="brand-subtitle">Create your WheelDeal Premium account</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registration Form -->
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+            
+            <!-- Full Name Field -->
+            <div class="form-field">
+              <app-modern-input
+                label="Full Name"
+                type="text"
+                placeholder="Enter your full name"
+                icon="fas fa-user"
+                formControlName="fullName"
+                [errorMessage]="getFieldError('fullName')"
+                size="lg"
+              ></app-modern-input>
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-field">
+              <app-modern-input
+                label="Email Address"
+                type="email"
+                placeholder="Enter your email address"
+                icon="fas fa-envelope"
+                formControlName="email"
+                [errorMessage]="getFieldError('email')"
+                size="lg"
+              ></app-modern-input>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-field">
+              <app-modern-input
+                label="Password"
+                type="password"
+                placeholder="Create a strong password"
+                icon="fas fa-lock"
+                formControlName="password"
+                [errorMessage]="getFieldError('password')"
+                [showPasswordToggle]="true"
+                size="lg"
+              ></app-modern-input>
+              
+              <!-- Password Strength Indicator -->
+              <div class="password-strength" *ngIf="registerForm.get('password')?.value">
+                <div class="strength-meter">
+                  <div class="strength-bar" [class]="getPasswordStrengthClass()"></div>
+                </div>
+                <small class="strength-text">{{ getPasswordStrengthText() }}</small>
+              </div>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="form-field">
+              <app-modern-input
+                label="Confirm Password"
+                type="password"
+                placeholder="Confirm your password"
+                icon="fas fa-lock"
+                formControlName="confirmPassword"
+                [errorMessage]="getFieldError('confirmPassword')"
+                [showPasswordToggle]="true"
+                size="lg"
+              ></app-modern-input>
+            </div>
+
+            <!-- Terms Agreement -->
+            <div class="form-field">
+              <div class="terms-agreement">
+                <label class="checkbox-wrapper">
+                  <input type="checkbox" class="modern-checkbox" id="agreeTerms" formControlName="agreeTerms">
+                  <span class="checkmark"></span>
+                  <span class="label-text">
+                    I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
+                  </span>
+                </label>
+                <div class="error-message" *ngIf="isFieldInvalid('agreeTerms')">
+                  You must agree to the terms and conditions
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+              <app-modern-button
+                text="Create Account"
+                loadingText="Creating Account..."
+                icon="fas fa-user-plus"
+                variant="primary"
+                size="lg"
+                type="submit"
+                [loading]="isLoading"
+                [disabled]="registerForm.invalid"
+                (onClick)="onSubmit()"
+                [showRipple]="true"
+              ></app-modern-button>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-section" *ngIf="errorMessage">
+              <div class="error-card">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>{{ errorMessage }}</span>
+              </div>
+            </div>
+          </form>
+
+          <!-- Divider -->
+          <div class="divider-section">
+            <div class="divider-line"></div>
+            <span class="divider-text">or continue with</span>
+            <div class="divider-line"></div>
+          </div>
+
+          <!-- Social Registration -->
+          <div class="social-section">
+            <app-modern-button
+              text="Sign up with Google"
+              icon="fab fa-google"
+              variant="outline"
+              size="lg"
+              (onClick)="registerWithGoogle()"
+              [showRipple]="true"
+              class="social-btn google-btn"
+            ></app-modern-button>
+          </div>
+
+          <!-- Footer -->
+          <div class="register-footer" footer>
+            <div class="footer-content">
+              <p class="signin-text">
+                Already have an account? 
+                <a routerLink="/login" class="signin-link">Sign in here</a>
+              </p>
+              <a routerLink="/home" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Home</span>
+              </a>
+            </div>
+          </div>
+
+        </app-modern-card>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <app-modern-loading
+    *ngIf="isLoading"
+    text="Creating Account..."
+    subtext="Please wait while we set up your account"
+    spinnerType="ring"
+    variant="primary"
+    [overlay]="true"
+    [fullscreen]="true"
+  ></app-modern-loading>
+</div>
+

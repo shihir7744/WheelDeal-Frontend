@@ -1,0 +1,252 @@
+.advanced-search-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  margin-bottom: 2rem;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f8f9fa;
+
+  h4 {
+    color: #495057;
+    margin: 0;
+    font-weight: 600;
+
+    i {
+      color: #007bff;
+    }
+  }
+
+  .filter-toggle {
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+      }
+    }
+  }
+}
+
+.search-form {
+  .basic-filters {
+    margin-bottom: 1.5rem;
+  }
+
+  .advanced-filters {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e9ecef;
+
+    .advanced-filters-header {
+      margin-bottom: 1rem;
+
+      h6 {
+        color: #495057;
+        font-weight: 600;
+        margin: 0;
+
+        i {
+          color: #6c757d;
+        }
+      }
+    }
+  }
+
+  .form-label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control,
+  .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+  }
+
+  .form-check {
+    .form-check-input {
+      &:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+    }
+
+    .form-check-label {
+      color: #495057;
+      font-weight: 500;
+    }
+  }
+}
+
+.form-actions {
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+
+  .filter-info {
+    .badge {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 20px;
+    }
+  }
+
+  .action-buttons {
+    .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      &:disabled {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      border: none;
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+      }
+    }
+
+    .btn-outline-secondary {
+      border: 2px solid #6c757d;
+      color: #6c757d;
+
+      &:hover:not(:disabled) {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+      }
+    }
+  }
+}
+
+// Animations
+.advanced-filters {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Loading state
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .advanced-search-container {
+    padding: 1rem;
+  }
+
+  .search-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .form-actions {
+    .d-flex {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start !important;
+    }
+
+    .action-buttons {
+      width: 100%;
+
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .advanced-filters {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .advanced-search-container {
+    padding: 0.75rem;
+  }
+
+  .search-form {
+    .row {
+      margin: 0;
+    }
+
+    .col-md-3 {
+      padding: 0 0.25rem;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+// Focus states for accessibility
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+}
+
+// Custom styling for select dropdowns
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+// Hover effects for form elements
+.form-control:hover,
+.form-select:hover {
+  border-color: #007bff;
+}
+
+// Disabled state styling
+.form-control:disabled,
+.form-select:disabled {
+  background-color: #e9ecef;
+  opacity: 0.65;
+} 

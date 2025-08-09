@@ -1,0 +1,198 @@
+<nav class="modern-navbar" [class.scrolled]="isScrolled">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <a routerLink="/home" class="brand-link">
+        <div class="brand-icon">
+          <i class="fas fa-car-side"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">WheelDeal</span>
+          <span class="brand-tagline">Premium</span>
+        </div>
+      </a>
+    </div>
+    
+    <div class="nav-toggle" (click)="toggleMobileMenu()">
+      <span class="hamburger-line" [class.active]="isMobileMenuOpen"></span>
+      <span class="hamburger-line" [class.active]="isMobileMenuOpen"></span>
+      <span class="hamburger-line" [class.active]="isMobileMenuOpen"></span>
+    </div>
+    
+    <div class="nav-menu" [class.active]="isMobileMenuOpen">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/cars" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-search"></i>
+            <span>Search Cars</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/compare" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-balance-scale"></i>
+            <span>Compare Cars</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="isAdminOrManager()">
+          <a class="nav-link" routerLink="/maintenance" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-tools"></i>
+            <span>Maintenance</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="isAdminOrManager()">
+          <a class="nav-link" routerLink="/financial" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-chart-line"></i>
+            <span>Financial</span>
+          </a>
+        </li>
+        <!-- Hide for ADMIN/MANAGER -->
+        <li class="nav-item" *ngIf="isLoggedIn && !(isAdminOrManager())">
+          <a class="nav-link" routerLink="/favorites" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-heart"></i>
+            <span>My Favorites</span>
+          </a>
+        </li>
+        <!-- Hide for ADMIN/MANAGER -->
+        <li class="nav-item" *ngIf="isLoggedIn && !(isAdminOrManager())">
+          <a class="nav-link" routerLink="/bookings" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-calendar-alt"></i>
+            <span>My Bookings</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn && currentUser?.role === 'ADMIN'">
+          <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn && currentUser?.role === 'MANAGER'">
+          <a class="nav-link" [routerLink]="['/manager/dashboard', getManagerBranchId()]" routerLinkActive="active" (click)="closeMobileMenu()">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="nav-auth">
+        <div class="auth-buttons" *ngIf="!isLoggedIn">
+          <a class="auth-link login-link" (click)="navigateToLogin()">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+          </a>
+          <a class="auth-link register-link" (click)="navigateToRegister()">
+            <i class="fas fa-user-plus"></i>
+            <span>Register</span>
+          </a>
+        </div>
+        
+        <div class="user-menu" *ngIf="isLoggedIn">
+          <div class="user-profile" (click)="toggleUserMenu()">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+              <span class="user-name">{{ currentUser?.fullName || 'User' }}</span>
+              <span class="user-role">{{ getRoleDisplayName(currentUser?.role) }}</span>
+            </div>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="isUserMenuOpen"></i>
+          </div>
+          
+          <div class="user-dropdown" [class.active]="isUserMenuOpen">
+            <!-- Profile Header -->
+            <div class="dropdown-header">
+              <div class="profile-summary">
+                <div class="profile-avatar">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-details">
+                  <div class="profile-name">{{ currentUser?.fullName || 'User' }}</div>
+                  <div class="profile-email">{{ currentUser?.email }}</div>
+                  <div class="profile-role">{{ getRoleDisplayName(currentUser?.role) }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="dropdown-divider"></div>
+            
+            <!-- Profile Actions -->
+            <a class="dropdown-item" routerLink="/profile" (click)="closeUserMenu()">
+              <i class="fas fa-user-circle"></i>
+              <span>My Profile</span>
+            </a>
+            
+            <!-- Hide for ADMIN/MANAGER -->
+            <a class="dropdown-item" routerLink="/favorites" (click)="closeUserMenu()" *ngIf="!(isAdminOrManager())">
+              <i class="fas fa-heart"></i>
+              <span>My Favorites</span>
+              <span class="badge bg-danger ms-auto" *ngIf="favoriteCount > 0">{{ favoriteCount }}</span>
+            </a>
+            
+            <!-- Hide for ADMIN/MANAGER -->
+            <a class="dropdown-item" routerLink="/bookings" (click)="closeUserMenu()" *ngIf="!(isAdminOrManager())">
+              <i class="fas fa-calendar-check"></i>
+              <span>My Bookings</span>
+              <span class="badge bg-primary ms-auto" *ngIf="bookingsCount > 0">{{ bookingsCount }}</span>
+            </a>
+            
+            <div class="quick-stats small text-muted px-3" *ngIf="!(isAdminOrManager()) && (bookingsCount > 0 || pendingBookingsCount > 0)">
+              <div class="d-flex justify-content-between mt-1">
+                <span>Active/Confirmed</span>
+                <span>{{ activeBookingsCount }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Pending</span>
+                <span>{{ pendingBookingsCount }}</span>
+              </div>
+            </div>
+            
+            <a class="dropdown-item" routerLink="/compare" (click)="closeUserMenu()">
+              <i class="fas fa-balance-scale"></i>
+              <span>Compare Cars</span>
+            </a>
+            
+            <a class="dropdown-item" *ngIf="currentUser?.role === 'ADMIN'" routerLink="/admin/dashboard" (click)="closeUserMenu()">
+              <i class="fas fa-chart-line"></i>
+              <span>Admin Dashboard</span>
+            </a>
+            
+            <!-- Hide for ADMIN/MANAGER (duplicate favorites entry) -->
+            <a class="dropdown-item" routerLink="/favorites" (click)="closeUserMenu()" *ngIf="!(isAdminOrManager())">
+              <i class="fas fa-heart"></i>
+              <span>Favorites</span>
+              <span class="badge bg-danger ms-auto" *ngIf="favoriteCount > 0">{{ favoriteCount }}</span>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+            
+            <!-- Settings -->
+            <a class="dropdown-item" routerLink="/settings" (click)="closeUserMenu()">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+            
+            <a class="dropdown-item" routerLink="/notifications" (click)="closeUserMenu()">
+              <i class="fas fa-bell"></i>
+              <span>Notifications</span>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+            
+            <!-- Logout Section -->
+            <div class="logout-section">
+              <a class="dropdown-item logout-item" href="#" (click)="confirmLogout(); closeUserMenu()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+

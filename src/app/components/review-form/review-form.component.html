@@ -1,0 +1,85 @@
+<div class="review-form">
+  <div class="form-header">
+    <h5 class="mb-3">
+      <i class="fas fa-edit me-2"></i>
+      {{ existingReview ? 'Edit Your Review' : 'Write a Review' }}
+    </h5>
+  </div>
+
+  <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()">
+    <!-- Rating Selection -->
+    <div class="form-group mb-3">
+      <label class="form-label fw-semibold">Your Rating</label>
+      <div class="rating-section">
+        <app-star-rating
+          [rating]="selectedRating"
+          [readonly]="false"
+          size="lg"
+          (ratingChange)="onRatingChange($event)"
+        ></app-star-rating>
+        <div class="rating-labels">
+          <small class="text-muted">
+            {{ selectedRating === 0 ? 'Select a rating' : 
+               selectedRating === 1 ? 'Poor' :
+               selectedRating === 2 ? 'Fair' :
+               selectedRating === 3 ? 'Good' :
+               selectedRating === 4 ? 'Very Good' : 'Excellent' }}
+          </small>
+        </div>
+      </div>
+      <div class="error-message" *ngIf="getRatingError()">
+        <i class="fas fa-exclamation-circle me-1"></i>
+        {{ getRatingError() }}
+      </div>
+    </div>
+
+    <!-- Comment Input -->
+    <div class="form-group mb-3">
+      <label class="form-label fw-semibold">Your Review</label>
+      <textarea
+        formControlName="comment"
+        class="form-control"
+        rows="4"
+        placeholder="Share your experience with this car (minimum 10 characters)..."
+        [class.is-invalid]="getCommentError()"
+      ></textarea>
+      <div class="form-text">
+        <small class="text-muted">
+          {{ reviewForm.get('comment')?.value?.length || 0 }}/1000 characters
+        </small>
+      </div>
+      <div class="error-message" *ngIf="getCommentError()">
+        <i class="fas fa-exclamation-circle me-1"></i>
+        {{ getCommentError() }}
+      </div>
+    </div>
+
+    <!-- Error Display -->
+    <div class="alert alert-danger" *ngIf="error">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        <i class="fas fa-times me-1"></i>
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="reviewForm.invalid || isSubmitting"
+      >
+        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!isSubmitting" class="fas fa-paper-plane me-1"></i>
+        {{ existingReview ? 'Update Review' : 'Submit Review' }}
+      </button>
+    </div>
+  </form>
+</div> 

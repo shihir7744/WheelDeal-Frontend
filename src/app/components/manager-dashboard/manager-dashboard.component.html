@@ -1,0 +1,499 @@
+<div class="manager-dashboard">
+  <div class="container py-4">
+    <!-- Header -->
+    <div class="dashboard-header text-center mb-5 fade-in">
+      <h1 class="display-5 fw-bold text-white mb-3">Branch Manager Dashboard</h1>
+      <p class="lead text-white-50">Branch {{ branchId }} Operations Overview</p>
+    </div>
+
+    <!-- Tabs like Admin -->
+    <div class="nav-tabs-section mb-4">
+      <div class="nav-tabs-container">
+        <ul class="nav admin-nav-tabs justify-content-center">
+          <li class="nav-item">
+            <button class="nav-link" [class.active]="activeTab==='overview'" (click)="switchTab('overview')">
+              <i class="fas fa-chart-pie me-2"></i>Overview
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" [class.active]="activeTab==='bookings'" (click)="switchTab('bookings')">
+              <i class="fas fa-calendar-check me-2"></i>Bookings
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" [class.active]="activeTab==='financial'" (click)="switchTab('financial')">
+              <i class="fas fa-dollar-sign me-2"></i>Financial
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" [class.active]="activeTab==='branch'" (click)="switchTab('branch')">
+              <i class="fas fa-building me-2"></i>Branch
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-light" role="status"></div>
+      <p class="text-white mt-3">Loading branch statistics...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="alert alert-danger text-center" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+      <button class="btn btn-outline-danger ms-3" (click)="loadDashboardStats()">
+        <i class="fas fa-redo me-2"></i>Retry
+      </button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div *ngIf="!isLoading && !error && dashboardStats && activeTab==='overview'" class="dashboard-content">
+      <!-- Key Metrics Row -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card card text-center bounce-in">
+            <div class="card-body p-4">
+              <div class="stat-icon mb-3"><i class="fas fa-car fa-2x text-primary"></i></div>
+              <h3 class="stat-number mb-2">{{ dashboardStats.totalCars }}</h3>
+              <p class="stat-label mb-0">Total Fleet</p>
+              <small class="text-muted" [ngClass]="getAvailabilityColor(dashboardStats.availableCars, dashboardStats.totalCars)">
+                {{ dashboardStats.availableCars }} available
+              </small>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card card text-center bounce-in" style="animation-delay: 0.1s;">
+            <div class="card-body p-4">
+              <div class="stat-icon mb-3"><i class="fas fa-calendar-check fa-2x text-success"></i></div>
+              <h3 class="stat-number mb-2">{{ dashboardStats.totalBookings }}</h3>
+              <p class="stat-label mb-0">Total Bookings</p>
+              <small class="text-muted">{{ dashboardStats.activeBookings }} active</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card card text-center bounce-in" style="animation-delay: 0.2s;">
+            <div class="card-body p-4">
+              <div class="stat-icon mb-3"><i class="fas fa-dollar-sign fa-2x text-warning"></i></div>
+              <h3 class="stat-number mb-2">{{ formatCurrency(dashboardStats.totalRevenue) }}</h3>
+              <p class="stat-label mb-0">Total Revenue</p>
+              <small class="text-muted">{{ formatCurrency(dashboardStats.monthlyRevenue) }} this month</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card card text-center bounce-in" style="animation-delay: 0.3s;">
+            <div class="card-body p-4">
+              <div class="stat-icon mb-3"><i class="fas fa-chart-line fa-2x text-info"></i></div>
+              <h3 class="stat-number mb-2" [ngClass]="getUtilizationColor(dashboardStats.fleetUtilizationRate)">{{ formatPercentage(dashboardStats.fleetUtilizationRate) }}</h3>
+              <p class="stat-label mb-0">Fleet Utilization</p>
+              <small class="text-muted">Current rate</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Branch Performance Row -->
+      <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+          <div class="card slide-up">
+            <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Booking Status</h5></div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6 col-md-4 text-center mb-3"><div class="status-item"><div class="status-number text-primary">{{ dashboardStats.activeBookings }}</div><div class="status-label">Active</div></div></div>
+                <div class="col-6 col-md-4 text-center mb-3"><div class="status-item"><div class="status-number text-warning">{{ dashboardStats.pendingBookings }}</div><div class="status-label">Pending</div></div></div>
+                <div class="col-6 col-md-4 text-center mb-3"><div class="status-item"><div class="status-number text-info">{{ dashboardStats.confirmedBookings }}</div><div class="status-label">Confirmed</div></div></div>
+                <div class="col-6 col-md-6 text-center mb-3"><div class="status-item"><div class="status-number text-success">{{ dashboardStats.completedBookings }}</div><div class="status-label">Completed</div></div></div>
+                <div class="col-6 col-md-6 text-center mb-3"><div class="status-item"><div class="status-number text-danger">{{ dashboardStats.cancelledBookings }}</div><div class="status-label">Cancelled</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <div class="card slide-up" style="animation-delay: 0.1s;">
+            <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Fleet Status</h5></div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6"><div class="metric-item"><span class="metric-label">Available Cars</span><span class="metric-value text-success">{{ dashboardStats.availableCars }}</span></div></div>
+                <div class="col-6"><div class="metric-item"><span class="metric-label">Rented Cars</span><span class="metric-value text-primary">{{ dashboardStats.totalCars - dashboardStats.availableCars }}</span></div></div>
+                <div class="col-6"><div class="metric-item"><span class="metric-label">Utilization Rate</span><span class="metric-value" [ngClass]="getUtilizationColor(dashboardStats.fleetUtilizationRate)">{{ formatPercentage(dashboardStats.fleetUtilizationRate) }}</span></div></div>
+                <div class="col-6"><div class="metric-item"><span class="metric-label">Total Fleet</span><span class="metric-value">{{ dashboardStats.totalCars }}</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings Tab -->
+    <div *ngIf="activeTab==='bookings'">
+      <div class="card slide-up mb-3">
+        <div class="card-header d-flex flex-wrap align-items-center gap-2">
+          <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h5>
+          <div class="ms-auto d-flex flex-wrap gap-2">
+            <select class="form-select" [(ngModel)]="bookingStatusFilter" (change)="onFilterChange()">
+              <option value="ALL">All</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="ACTIVE">Active</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+            <input class="form-control" placeholder="Search by ID, customer, car" [(ngModel)]="bookingSearch" (input)="onFilterChange()" />
+            <select class="form-select" [(ngModel)]="bookingsPageSize" (change)="onFilterChange()">
+              <option [ngValue]="5">5</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="20">20</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Row -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card slide-up" style="animation-delay: 0.2s;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fas fa-tools me-2"></i>Branch Management
+              </h5>
+              <div>
+                <button *ngIf="!branchEditing" class="btn btn-sm btn-outline-primary" (click)="openBranchEdit()" [disabled]="branchLoading || !branch"><i class="fas fa-edit me-1"></i>Edit</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div *ngIf="branchError" class="alert alert-danger mb-3">{{ branchError }}</div>
+              <div *ngIf="branchLoading" class="text-center py-4"><div class="spinner-border"></div></div>
+
+              <div *ngIf="!branchLoading && branch && !branchEditing" class="row g-3">
+                <div class="col-md-4">
+                  <div class="metric-item">
+                    <span class="metric-label">Branch Name</span>
+                    <span class="metric-value">{{ branch.name }}</span>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="metric-item">
+                    <span class="metric-label">City</span>
+                    <span class="metric-value">{{ branch.city }}</span>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="metric-item">
+                    <span class="metric-label">Address</span>
+                    <span class="metric-value">{{ branch.address }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <form *ngIf="!branchLoading && branchEditing" (ngSubmit)="saveBranch()" class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Branch Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="branchForm.name" name="name" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">City</label>
+                  <input type="text" class="form-control" [(ngModel)]="branchForm.city" name="city" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Address</label>
+                  <input type="text" class="form-control" [(ngModel)]="branchForm.address" name="address" required />
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-outline-secondary" (click)="cancelBranchEdit()">Cancel</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="savingBranch">
+                    <span *ngIf="savingBranch" class="spinner-border spinner-border-sm me-2"></span>
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Management -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card slide-up">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-calendar-check me-2"></i>Pending Bookings
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="bookingError" class="alert alert-danger mb-3">{{ bookingError }}</div>
+              <div *ngIf="bookingsLoading" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+              </div>
+              <div *ngIf="!bookingsLoading && pendingBookings.length === 0" class="text-center text-muted">
+                No pending bookings for this branch.
+              </div>
+              <div class="table-responsive" *ngIf="!bookingsLoading && pendingBookings.length > 0">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Customer</th>
+                      <th>Car</th>
+                      <th>Dates</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let b of pendingBookings">
+                      <td>#{{ b.id }}</td>
+                      <td>{{ b.userFullName }}</td>
+                      <td>{{ b.carBrand }} {{ b.carModel }}</td>
+                      <td>{{ b.startDate | date:'mediumDate' }} - {{ b.endDate | date:'mediumDate' }}</td>
+                      <td class="text-end">
+                        <button class="btn btn-sm btn-success me-2" (click)="confirm(b)">
+                          <i class="fas fa-check me-1"></i>Confirm
+                        </button>
+                        <button class="btn btn-sm btn-danger" (click)="reject(b)">
+                          <i class="fas fa-times me-1"></i>Reject
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmed Bookings -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card slide-up">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-check-circle me-2"></i>Confirmed Bookings
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="confirmedError" class="alert alert-danger mb-3">{{ confirmedError }}</div>
+              <div *ngIf="confirmedLoading" class="text-center py-4"><div class="spinner-border text-success"></div></div>
+              <div *ngIf="!confirmedLoading && confirmedBookings.length === 0" class="text-center text-muted">No confirmed bookings.</div>
+              <div class="table-responsive" *ngIf="!confirmedLoading && confirmedBookings.length > 0">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Customer</th>
+                      <th>Car</th>
+                      <th>Dates</th>
+                      <th>Status</th>
+                      <th>Created</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let b of confirmedBookings">
+                      <td>#{{ b.id }}</td>
+                      <td>
+                        <div>{{ b.userFullName }}</div>
+                        <small class="text-muted">{{ b.userEmail }}</small>
+                      </td>
+                      <td>{{ b.carBrand }} {{ b.carModel }}</td>
+                      <td>{{ b.startDate | date:'mediumDate' }} - {{ b.endDate | date:'mediumDate' }}</td>
+                      <td><span class="badge" [ngClass]="getBookingBadgeClass(b.status)">{{ b.status }}</span></td>
+                      <td>{{ b.createdAt | date:'short' }}</td>
+                      <td class="text-end">
+                        <div class="btn-group">
+                          <button class="btn btn-sm btn-success" (click)="setActive(b)" [disabled]="b.status==='ACTIVE'">
+                            <i class="fas fa-play me-1"></i>Active
+                          </button>
+                          <button class="btn btn-sm btn-primary" (click)="setCompleted(b)" [disabled]="b.status==='COMPLETED'">
+                            <i class="fas fa-flag-checkered me-1"></i>Complete
+                          </button>
+                          <button class="btn btn-sm btn-danger" (click)="setCancelled(b)" [disabled]="b.status==='CANCELLED'">
+                            <i class="fas fa-ban me-1"></i>Cancel
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simple pagination controls -->
+      <div class="d-flex justify-content-end gap-2 mt-2">
+        <button class="btn btn-outline-secondary btn-sm" (click)="changeBookingsPage(bookingsPage-1)" [disabled]="bookingsPage===1">Prev</button>
+        <span class="badge bg-light text-dark align-self-center">Page {{ bookingsPage }}</span>
+        <button class="btn btn-outline-secondary btn-sm" (click)="changeBookingsPage(bookingsPage+1)" [disabled]="confirmedBookings.length < bookingsPageSize">Next</button>
+      </div>
+    </div>
+
+    <!-- Financial Tab -->
+    <div *ngIf="activeTab==='financial'">
+      <!-- Financial Summary -->
+      <div class="row mt-4">
+        <div class="col-lg-6 mb-3">
+          <div class="card slide-up">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Current Month Financials</h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="reportLoading" class="text-center py-3"><div class="spinner-border"></div></div>
+              <div *ngIf="financialError" class="alert alert-danger">{{ financialError }}</div>
+              <div *ngIf="!reportLoading && financialReport">
+                <div class="row text-center">
+                  <div class="col-4">
+                    <div class="metric-item">
+                      <span class="metric-label">Total Revenue</span>
+                      <span class="metric-value text-success">{{ formatCurrency(financialReport.totalRevenue) }}</span>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="metric-item">
+                      <span class="metric-label">Total Expense</span>
+                      <span class="metric-value text-danger">{{ formatCurrency(financialReport.totalExpenses) }}</span>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="metric-item">
+                      <span class="metric-label">Net</span>
+                      <span class="metric-value">{{ formatCurrency(financialReport.netProfit) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <div class="card slide-up">
+            <div class="card-header"><h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Recent Transactions</h5></div>
+            <div class="card-body">
+              <div *ngIf="txLoading" class="text-center py-3"><div class="spinner-border"></div></div>
+              <div *ngIf="transactionsError" class="alert alert-danger">{{ transactionsError }}</div>
+              <div class="table-responsive" *ngIf="!txLoading && transactions.length > 0">
+                <table class="table align-middle">
+                  <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr *ngFor="let t of transactions">
+                      <td>{{ formatDateTime(t.transactionDate) }}</td>
+                      <td><i [class]="getTransactionTypeIcon(t.transactionType)" class="me-2"></i>{{ getTransactionTypeLabel(t.transactionType) }}</td>
+                      <td>{{ formatCurrency(t.amount) }}</td>
+                      <td><span class="badge" [ngClass]="'bg-' + getStatusColor(t.status)">{{ getTransactionStatusLabel(t.status) }}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div *ngIf="!txLoading && transactions.length === 0" class="text-muted">No transactions.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Tab -->
+    <div *ngIf="activeTab==='branch'">
+      <!-- Quick Fleet Pane -->
+      <div class="card slide-up mb-3">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h5 class="mb-0"><i class="fas fa-car me-2"></i>Quick Fleet</h5>
+          <small class="text-white-50">Toggle availability</small>
+        </div>
+        <div class="card-body">
+          <div *ngIf="fleetError" class="alert alert-danger mb-3">{{ fleetError }}</div>
+          <div *ngIf="fleetLoading" class="text-center py-3"><div class="spinner-border"></div></div>
+          <div class="table-responsive" *ngIf="!fleetLoading">
+            <table class="table align-middle">
+              <thead><tr><th>ID</th><th>Car</th><th>Type</th><th>Price</th><th>Available</th><th class="text-end">Action</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let c of branchCars">
+                  <td>#{{ c.id }}</td>
+                  <td>{{ c.brand }} {{ c.model }}</td>
+                  <td>{{ c.type }}</td>
+                  <td>{{ formatCurrency(c.price) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="c.availability ? 'bg-success' : 'bg-secondary'">{{ c.availability ? 'Yes' : 'No' }}</span>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm" [ngClass]="c.availability ? 'btn-outline-secondary' : 'btn-outline-success'" (click)="toggleAvailability(c)">
+                      <i class="fas" [class.fa-toggle-on]="c.availability" [class.fa-toggle-off]="!c.availability"></i>
+                      <span class="ms-1">{{ c.availability ? 'Disable' : 'Enable' }}</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Row -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card slide-up" style="animation-delay: 0.2s;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fas fa-tools me-2"></i>Branch Management
+              </h5>
+              <div>
+                <button *ngIf="!branchEditing" class="btn btn-sm btn-outline-primary" (click)="openBranchEdit()" [disabled]="branchLoading || !branch"><i class="fas fa-edit me-1"></i>Edit</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div *ngIf="branchError" class="alert alert-danger mb-3">{{ branchError }}</div>
+              <div *ngIf="branchLoading" class="text-center py-4"><div class="spinner-border"></div></div>
+
+              <div *ngIf="!branchLoading && branch && !branchEditing" class="row g-3">
+                <div class="col-md-4">
+                  <div class="metric-item">
+                    <span class="metric-label">Branch Name</span>
+                    <span class="metric-value">{{ branch.name }}</span>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="metric-item">
+                    <span class="metric-label">City</span>
+                    <span class="metric-value">{{ branch.city }}</span>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="metric-item">
+                    <span class="metric-label">Address</span>
+                    <span class="metric-value">{{ branch.address }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <form *ngIf="!branchLoading && branchEditing" (ngSubmit)="saveBranch()" class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Branch Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="branchForm.name" name="name" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">City</label>
+                  <input type="text" class="form-control" [(ngModel)]="branchForm.city" name="city" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Address</label>
+                  <input type="text" class="form-control" [(ngModel)]="branchForm.address" name="address" required />
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-outline-secondary" (click)="cancelBranchEdit()">Cancel</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="savingBranch">
+                    <span *ngIf="savingBranch" class="spinner-border spinner-border-sm me-2"></span>
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
