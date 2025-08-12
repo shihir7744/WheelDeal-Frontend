@@ -13,8 +13,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build the application with better error handling
+# Build the application with comprehensive error handling
 RUN echo "=== Starting Angular build ===" && \
+    echo "=== Angular CLI version ===" && \
+    ng version && \
+    echo "=== Building with production configuration ===" && \
     ng build --configuration production && \
     echo "=== Angular build completed ===" && \
     echo "=== Contents of app directory ===" && \
@@ -23,14 +26,19 @@ RUN echo "=== Starting Angular build ===" && \
     ls -la dist/ && \
     echo "=== Contents of dist/frontend directory ===" && \
     ls -la dist/frontend/ && \
-    echo "=== Checking for index.html ===" && \
+    echo "=== Checking for Angular app files ===" && \
     if [ -f dist/frontend/index.html ]; then \
         echo "SUCCESS: index.html found in dist/frontend/"; \
+        echo "=== Angular app files found ===" && \
         ls -la dist/frontend/ | grep -E "\.(html|js|css)$"; \
+        echo "=== index.html content preview ===" && \
+        head -10 dist/frontend/index.html; \
     else \
         echo "ERROR: index.html not found in dist/frontend/"; \
-        echo "Build output directory contents:"; \
+        echo "=== Searching for any HTML/JS/CSS files in dist ===" && \
         find dist/ -type f -name "*.html" -o -name "*.js" -o -name "*.css" || echo "No HTML/JS/CSS files found"; \
+        echo "=== Full dist directory tree ===" && \
+        find dist/ -type f; \
         exit 1; \
     fi
 
@@ -51,11 +59,15 @@ RUN echo "=== Nginx HTML Directory Contents ===" && \
     ls -la /usr/share/nginx/html/ && \
     echo "=== Checking for index.html ===" && \
     if [ -f /usr/share/nginx/html/index.html ]; then \
-        echo "index.html found - Angular app copied successfully"; \
-        echo "First few lines of index.html:"; \
-        head -5 /usr/share/nginx/html/index.html; \
+        echo "SUCCESS: index.html found - Angular app copied successfully"; \
+        echo "=== Angular app files in nginx ===" && \
+        ls -la /usr/share/nginx/html/ | grep -E "\.(html|js|css)$"; \
+        echo "=== index.html content preview ===" && \
+        head -10 /usr/share/nginx/html/index.html; \
     else \
         echo "ERROR: index.html not found - Angular app copy failed"; \
+        echo "=== Full nginx html directory contents ===" && \
+        find /usr/share/nginx/html/ -type f; \
         exit 1; \
     fi
 
