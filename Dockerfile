@@ -16,9 +16,9 @@ COPY . .
 # Build the application with comprehensive error handling
 RUN echo "=== Starting Angular build ===" && \
     echo "=== Angular CLI version ===" && \
-    ng version && \
+    npx ng version && \
     echo "=== Building with production configuration ===" && \
-    ng build --configuration production && \
+    npx ng build --configuration production && \
     echo "=== Angular build completed ===" && \
     echo "=== Contents of app directory ===" && \
     ls -la && \
