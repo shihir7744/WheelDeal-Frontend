@@ -13,8 +13,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application with production configuration
+RUN npm run build:prod
+
+# Debug: List the build output
+RUN ls -la dist/ && ls -la dist/frontend/
 
 # Production stage
 FROM nginx:alpine
@@ -24,6 +27,9 @@ RUN apk add --no-cache bash
 
 # Copy built application
 COPY --from=build /app/dist/frontend /usr/share/nginx/html
+
+# Debug: List what was copied to nginx html directory
+RUN ls -la /usr/share/nginx/html/
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf.template
@@ -36,6 +42,8 @@ RUN echo '#!/bin/bash' > /docker-entrypoint.sh && \
     echo 'envsubst "\$PORT" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf' >> /docker-entrypoint.sh && \
     echo 'echo "Nginx configuration updated with PORT: $PORT"' >> /docker-entrypoint.sh && \
     echo 'cat /etc/nginx/nginx.conf | grep "listen"' >> /docker-entrypoint.sh && \
+    echo 'echo "Contents of nginx html directory:"' >> /docker-entrypoint.sh && \
+    echo 'ls -la /usr/share/nginx/html/' >> /docker-entrypoint.sh && \
     echo 'nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
     chmod +x /docker-entrypoint.sh
 
