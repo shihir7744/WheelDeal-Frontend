@@ -29,10 +29,15 @@ COPY --from=build /app/dist/frontend /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf.template
 
 # Create startup script
-RUN echo '#!/bin/bash\n\
-envsubst "\$PORT" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf\n\
-nginx -g "daemon off;"' > /docker-entrypoint.sh && \
-chmod +x /docker-entrypoint.sh
+RUN echo '#!/bin/bash' > /docker-entrypoint.sh && \
+    echo 'set -e' >> /docker-entrypoint.sh && \
+    echo 'echo "Starting nginx with PORT: ${PORT:-80}"' >> /docker-entrypoint.sh && \
+    echo 'export PORT=${PORT:-80}' >> /docker-entrypoint.sh && \
+    echo 'envsubst "\$PORT" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf' >> /docker-entrypoint.sh && \
+    echo 'echo "Nginx configuration updated with PORT: $PORT"' >> /docker-entrypoint.sh && \
+    echo 'cat /etc/nginx/nginx.conf | grep "listen"' >> /docker-entrypoint.sh && \
+    echo 'nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
 
 # Expose port (will be overridden by Railway)
 EXPOSE 80
