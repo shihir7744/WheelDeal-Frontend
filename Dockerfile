@@ -26,15 +26,17 @@ RUN echo "=== Starting Angular build ===" && \
     ls -la dist/ && \
     echo "=== Contents of dist/frontend directory ===" && \
     ls -la dist/frontend/ && \
+    echo "=== Contents of dist/frontend/browser directory ===" && \
+    ls -la dist/frontend/browser/ && \
     echo "=== Checking for Angular app files ===" && \
-    if [ -f dist/frontend/index.html ]; then \
-        echo "SUCCESS: index.html found in dist/frontend/"; \
+    if [ -f dist/frontend/browser/index.html ]; then \
+        echo "SUCCESS: index.html found in dist/frontend/browser/"; \
         echo "=== Angular app files found ===" && \
-        ls -la dist/frontend/ | grep -E "\.(html|js|css)$"; \
+        ls -la dist/frontend/browser/ | grep -E "\.(html|js|css)$"; \
         echo "=== index.html content preview ===" && \
-        head -10 dist/frontend/index.html; \
+        head -10 dist/frontend/browser/index.html; \
     else \
-        echo "ERROR: index.html not found in dist/frontend/"; \
+        echo "ERROR: index.html not found in dist/frontend/browser/"; \
         echo "=== Searching for any HTML/JS/CSS files in dist ===" && \
         find dist/ -type f -name "*.html" -o -name "*.js" -o -name "*.css" || echo "No HTML/JS/CSS files found"; \
         echo "=== Full dist directory tree ===" && \
@@ -51,8 +53,8 @@ RUN apk add --no-cache bash
 # Remove default nginx files
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy built application - with verification
-COPY --from=build /app/dist/frontend /usr/share/nginx/html
+# Copy built application from the correct location
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 
 # Verify what was copied
 RUN echo "=== Nginx HTML Directory Contents ===" && \
