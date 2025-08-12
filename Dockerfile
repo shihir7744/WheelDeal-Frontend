@@ -16,13 +16,14 @@ COPY . .
 # Build the application with production configuration
 RUN npm run build:prod
 
-# Debug: Show build output structure
-RUN echo "=== Build Output Structure ===" && \
+# Debug: Show what was built
+RUN echo "=== Build completed ===" && \
+    echo "=== Contents of app directory ===" && \
     ls -la && \
-    echo "=== dist directory ===" && \
+    echo "=== Contents of dist directory ===" && \
     ls -la dist/ && \
-    echo "=== dist/frontend directory ===" && \
-    ls -la dist/frontend/ || echo "dist/frontend not found"
+    echo "=== Contents of dist/frontend directory ===" && \
+    ls -la dist/frontend/
 
 # Production stage
 FROM nginx:alpine
@@ -30,13 +31,13 @@ FROM nginx:alpine
 # Install envsubst for environment variable substitution
 RUN apk add --no-cache bash
 
-# Copy built application - try multiple possible locations
-COPY --from=build /app/dist/frontend /usr/share/nginx/html/ || \
-COPY --from=build /app/dist /usr/share/nginx/html/ || \
-COPY --from=build /app/dist/frontend/* /usr/share/nginx/html/ || \
-COPY --from=build /app/dist/* /usr/share/nginx/html/
+# Remove default nginx files
+RUN rm -rf /usr/share/nginx/html/*
 
-# Debug: Show what was copied
+# Copy built application
+COPY --from=build /app/dist/frontend /usr/share/nginx/html
+
+# Verify what was copied
 RUN echo "=== Nginx HTML Directory Contents ===" && \
     ls -la /usr/share/nginx/html/
 
@@ -48,8 +49,6 @@ RUN echo '#!/bin/bash' > /docker-entrypoint.sh && \
     echo 'set -e' >> /docker-entrypoint.sh && \
     echo 'echo "=== Starting nginx with PORT: ${PORT:-80} ==="' >> /docker-entrypoint.sh && \
     echo 'export PORT=${PORT:-80}' >> /docker-entrypoint.sh && \
-    echo 'echo "=== Current working directory ==="' >> /docker-entrypoint.sh && \
-    echo 'pwd' >> /docker-entrypoint.sh && \
     echo 'echo "=== Contents of nginx html directory ==="' >> /docker-entrypoint.sh && \
     echo 'ls -la /usr/share/nginx/html/' >> /docker-entrypoint.sh && \
     echo 'echo "=== Updating nginx config with PORT: $PORT ==="' >> /docker-entrypoint.sh && \
