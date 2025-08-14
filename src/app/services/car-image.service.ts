@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { CarImage, ImageUploadResponse, ImageMetadata } from '../models/car-image.model';
+import { CarImage, ImageUploadResponse } from '../models/car-image.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({

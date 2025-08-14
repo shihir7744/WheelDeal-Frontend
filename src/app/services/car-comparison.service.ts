@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CarComparison, ComparisonResult, ComparisonCriteria } from '../models/car-comparison.model';
+import { CarComparisonRequest, CarComparisonResult } from '../models/car-comparison.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({

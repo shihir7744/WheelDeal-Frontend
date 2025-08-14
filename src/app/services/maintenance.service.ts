@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { MaintenanceRecord, MaintenanceSchedule, MaintenanceType, MaintenanceStatus } from '../models/maintenance.model';
+import { MaintenanceRecord, MaintenanceType, MaintenanceStatus } from '../models/maintenance.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
