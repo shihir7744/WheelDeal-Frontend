@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { MaintenanceRecord, MaintenanceFilter } from '../models/maintenance.model';
+import { MaintenanceRecord, MaintenanceSchedule, MaintenanceType, MaintenanceStatus } from '../models/maintenance.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MaintenanceService {
-  private apiUrl = 'http://localhost:8080/api/maintenance';
+  private apiUrl = environment.apiUrl + '/maintenance';
 
   constructor(private http: HttpClient) {}
 

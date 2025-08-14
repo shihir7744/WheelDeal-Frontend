@@ -7,12 +7,13 @@ import {
   BookingDto, 
   PendingBookingStats 
 } from '../models/booking-confirmation.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingConfirmationService {
-  private apiUrl = 'http://localhost:8080/api/booking-confirmation';
+  private apiUrl = environment.apiUrl + '/booking-confirmation';
 
   constructor(private http: HttpClient) {}
 

@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CarComparisonRequest, CarComparisonResult } from '../models/car-comparison.model';
+import { CarComparison, ComparisonResult, ComparisonCriteria } from '../models/car-comparison.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarComparisonService {
-  private apiUrl = 'http://localhost:8080/api/car-comparison';
+  private apiUrl = environment.apiUrl + '/car-comparison';
 
   constructor(private http: HttpClient) {}
 

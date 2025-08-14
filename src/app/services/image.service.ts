@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CarImage } from '../models/car.model';
+import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ImageUploadResponse, ImageMetadata, ImageType } from '../models/image.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +11,7 @@ import { CarImage } from '../models/car.model';
 export class ImageService {
 
   // Use the same base URL as other services, but without the /api prefix for static resources
-  private readonly backendUrl = 'http://localhost:8080';
+  private readonly backendUrl = environment.baseUrl;
 
   constructor() { }
 

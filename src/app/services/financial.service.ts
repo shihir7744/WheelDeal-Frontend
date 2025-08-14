@@ -10,12 +10,13 @@ import {
   TransactionTypeOption,
   TransactionStatusOption 
 } from '../models/financial.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FinancialService {
-  private apiUrl = 'http://localhost:8080/api/financial';
+  private apiUrl = environment.apiUrl + '/financial';
 
   constructor(private http: HttpClient) {}
 

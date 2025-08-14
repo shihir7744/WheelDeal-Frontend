@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Rating, RatingStats, RatingDistribution, UserRatingStatus } from '../models/rating.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RatingService {
-  private apiUrl = 'http://localhost:8080/api/ratings';
+  private apiUrl = environment.apiUrl + '/ratings';
 
   constructor(private http: HttpClient) {}
 

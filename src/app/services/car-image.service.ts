@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { CarImage } from '../models/car-image.model';
+import { CarImage, ImageUploadResponse, ImageMetadata } from '../models/car-image.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarImageService {
-  private apiUrl = 'http://localhost:8080/api/car-images';
+  private apiUrl = environment.apiUrl + '/car-images';
 
   constructor(private http: HttpClient) { }
 
@@ -120,9 +121,9 @@ export class CarImageService {
     return this.http.get<number>(`${this.apiUrl}/${carId}/primary-count`);
   }
 
-  // Helper method to get image URL
+  // Helper method to get full image URL
   getImageUrl(imagePath: string): string {
-    return `http://localhost:8080${imagePath}`;
+    return `${environment.baseUrl}${imagePath}`;
   }
 
   // Helper method to validate file

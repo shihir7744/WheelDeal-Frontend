@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, map, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Car } from '../models/car.model';
+import { Car, CarSearchFilters } from '../models/car.model';
 import { Branch } from '../models/branch.model';
 import { DashboardStats } from '../models/dashboard.model';
+import { environment } from '../../environments/environment';
 
 export interface HomeStats {
   totalCars: number;
@@ -34,7 +35,7 @@ export interface HomeData {
   providedIn: 'root'
 })
 export class HomeService {
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

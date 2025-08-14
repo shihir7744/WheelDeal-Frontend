@@ -6,6 +6,9 @@ import { HomeService, HomeData, HomeStats } from '../../services/home.service';
 import { ModernButtonComponent } from '../shared/modern-button.component';
 import { ModernCardComponent } from '../shared/modern-card.component';
 import { Car } from '../../models/car.model';
+import { Branch } from '../../models/branch.model';
+import { DashboardStats } from '../../models/dashboard.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -157,7 +160,7 @@ export class HomeComponent implements OnInit {
   getCarImageUrl(car: Car): string {
     if (car.images && car.images.length > 0) {
       const primaryImage = car.images.find(img => img.isPrimary) || car.images[0];
-      return `http://localhost:8080/uploads/${primaryImage.fileName}`;
+      return `${environment.baseUrl}/uploads/${primaryImage.fileName}`;
     }
     return 'assets/images/default-car.jpg';
   }
