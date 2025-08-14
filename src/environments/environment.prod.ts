@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://wheeldeal-backend-production.up.railway.app/api',
-  baseUrl: 'https://wheeldeal-backend-production.up.railway.app'
+  apiUrl: (window as any).__env?.API_URL || 'https://wheeldeal-backend-production.up.railway.app/api',
+  baseUrl: (window as any).__env?.BASE_URL || 'https://wheeldeal-backend-production.up.railway.app'
 };
