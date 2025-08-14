@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { Car, CarSearchFilters } from '../models/car.model';
 import { Branch } from '../models/branch.model';
 import { DashboardStats } from '../models/dashboard.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
 export interface HomeStats {
   totalCars: number;

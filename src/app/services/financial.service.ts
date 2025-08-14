@@ -10,7 +10,7 @@ import {
   TransactionTypeOption,
   TransactionStatusOption 
 } from '../models/financial.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'

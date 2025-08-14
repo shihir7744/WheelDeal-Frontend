@@ -7,7 +7,7 @@ import {
   BookingDto, 
   PendingBookingStats 
 } from '../models/booking-confirmation.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'

@@ -8,7 +8,7 @@ import { ModernCardComponent } from '../shared/modern-card.component';
 import { Car } from '../../models/car.model';
 import { Branch } from '../../models/branch.model';
 import { DashboardStats } from '../../models/dashboard.model';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 
 @Component({
   selector: 'app-home',

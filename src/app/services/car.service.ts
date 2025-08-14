@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Car, CarSearchFilters, AdvancedCarSearchFilters, FilterOptions } from '../models/car.model';
 import { CarSpecifications } from '../models/car-specifications.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
